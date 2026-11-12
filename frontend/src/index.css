@@ -1,0 +1,147 @@
+
+@import "tailwindcss";
+
+/* Global base styles */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+  }
+
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-height: 100%;
+  }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #020617;
+    color: #ffffff;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+/* =========================================
+   LIGHT THEME
+========================================= */
+
+/* Main page background */
+html[data-theme="light"] body {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* Main section backgrounds */
+html[data-theme="light"] .bg-slate-950,
+html[data-theme="light"] .bg-slate-950\/90,
+html[data-theme="light"] .bg-slate-950\/80 {
+  background-color: #ffffff !important;
+}
+
+html[data-theme="light"] .bg-slate-900,
+html[data-theme="light"] .bg-slate-900\/60 {
+  background-color: #f1f5f9 !important;
+}
+
+html[data-theme="light"] .bg-slate-800,
+html[data-theme="light"] .bg-slate-800\/80 {
+  background-color: #e2e8f0 !important;
+}
+
+/* Text colors */
+html[data-theme="light"] .text-white {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .text-slate-200,
+html[data-theme="light"] .text-slate-300 {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .text-slate-400,
+html[data-theme="light"] .text-slate-500 {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .text-slate-950 {
+  color: #ffffff !important;
+}
+
+/* Teal accent colors */
+html[data-theme="light"] .text-teal-400 {
+  color: #0f766e !important;
+}
+
+html[data-theme="light"] .text-teal-300 {
+  color: #0d9488 !important;
+}
+
+html[data-theme="light"] .bg-teal-400 {
+  background-color: #0d9488 !important;
+}
+
+html[data-theme="light"] .bg-teal-400\/10 {
+  background-color: #ccfbf1 !important;
+}
+
+html[data-theme="light"] .hover\:bg-teal-300:hover {
+  background-color: #14b8a6 !important;
+}
+
+/* Border colors */
+html[data-theme="light"] .border-white\/10,
+html[data-theme="light"] .border-white\/15 {
+  border-color: #cbd5e1 !important;
+}
+
+html[data-theme="light"] .border-teal-400\/30 {
+  border-color: rgba(13, 148, 136, 0.3) !important;
+}
+
+/* Navigation styling */
+html[data-theme="light"] nav {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Gradient backgrounds */
+html[data-theme="light"] .bg-gradient-to-r {
+  background-image: linear-gradient(
+    to right,
+    #ccfbf1,
+    #f8fafc,
+    #cffafe
+  ) !important;
+}
+
+/* Dashboard map preview */
+html[data-theme="light"] .bg-slate-800 {
+  background-color: #e2e8f0 !important;
+}
+
+/* Theme transition */
+html[data-theme="light"] nav,
+html[data-theme="light"] section,
+html[data-theme="light"] footer,
+html[data-theme="light"] main {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Selected text */
+::selection {
+  background: #2dd4bf;
+  color: #020617;
+}
