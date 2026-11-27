@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Menu,
   Bell,
@@ -22,37 +23,38 @@ import { useTheme } from "../context/ThemeContext";
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const stats = [
     {
-      title: "Total Trips",
+      title: t("totalTrips"),
       value: "12",
-      subtitle: "Journeys completed",
+      subtitle: t("journeysCompleted"),
       icon: MapPin,
       color: "text-blue-400",
       bg: "bg-blue-400/10",
     },
     {
-      title: "Safety Score",
+      title: t("safetyScore"),
       value: "94/100",
-      subtitle: "Excellent safety level",
+      subtitle: t("excellentSafety"),
       icon: ShieldCheck,
       color: "text-teal-400",
       bg: "bg-teal-400/10",
     },
     {
-      title: "Active Alerts",
+      title: t("activeAlerts"),
       value: "02",
-      subtitle: "Requires your attention",
+      subtitle: t("requiresAttention"),
       icon: AlertTriangle,
       color: "text-orange-400",
       bg: "bg-orange-400/10",
     },
     {
-      title: "Distance Travelled",
+      title: t("distanceTravelled"),
       value: "248 km",
-      subtitle: "Across all journeys",
+      subtitle: t("acrossJourneys"),
       icon: Route,
       color: "text-purple-400",
       bg: "bg-purple-400/10",
@@ -61,41 +63,41 @@ function Dashboard() {
 
   const activities = [
     {
-      title: "Location monitoring started",
-      detail: "Your location monitoring session is active.",
-      time: "Today, 10:30 AM",
+      title: t("locationMonitoringStarted"),
+      detail: t("locationMonitoringDetail"),
+      time: t("today1030"),
       icon: Navigation,
     },
     {
-      title: "Safety check completed",
-      detail: "Your recent safety check was completed.",
-      time: "Today, 09:15 AM",
+      title: t("safetyCheckCompleted"),
+      detail: t("safetyCheckDetail"),
+      time: t("today0915"),
       icon: ShieldCheck,
     },
     {
-      title: "Journey completed",
-      detail: "Your previous trip was marked as completed.",
-      time: "Yesterday, 05:45 PM",
+      title: t("journeyCompleted"),
+      detail: t("journeyCompletedDetail"),
+      time: t("yesterday0545"),
       icon: MapPin,
     },
   ];
 
   const quickActions = [
     {
-      title: "Start a Journey",
-      description: "Begin monitoring your next trip.",
+      title: t("startJourney"),
+      description: t("startJourneyDescription"),
       icon: Navigation,
       action: () => navigate("/trips"),
     },
     {
-      title: "Find Safe Routes",
-      description: "Explore safer travel routes.",
+      title: t("findSafeRoutes"),
+      description: t("findSafeRoutesDescription"),
       icon: Route,
       action: () => navigate("/safe-routes"),
     },
     {
-      title: "Emergency SOS",
-      description: "Open the emergency assistance page.",
+      title: t("emergency"),
+      description: t("emergencyDescription"),
       icon: AlertTriangle,
       action: () => navigate("/emergency"),
     },
@@ -108,9 +110,8 @@ function Dashboard() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      {/* Main dashboard content */}
       <main className="min-h-screen lg:ml-72">
-        {/* Top navigation */}
+        {/* Main dashboard content */}
         <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-white/10 bg-slate-950/90 px-5 backdrop-blur-xl sm:px-8">
           <div className="flex items-center gap-4">
             <button
@@ -122,9 +123,11 @@ function Dashboard() {
             </button>
 
             <div>
-              <h1 className="text-lg font-bold sm:text-xl">Dashboard</h1>
+              <h1 className="text-lg font-bold sm:text-xl">
+                {t("dashboard")}
+              </h1>
               <p className="text-xs text-slate-400 sm:text-sm">
-                Your personal safety overview
+                {t("personalSafetyOverview")}
               </p>
             </div>
           </div>
@@ -139,8 +142,9 @@ function Dashboard() {
             </button>
 
             <button
+              onClick={() => navigate("/notifications")}
               className="relative rounded-xl border border-white/10 p-2.5 text-slate-300 transition hover:bg-slate-800"
-              aria-label="Notifications"
+              aria-label={t("notifications")}
             >
               <Bell size={19} />
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-teal-400"></span>
@@ -156,12 +160,14 @@ function Dashboard() {
           {/* Welcome section */}
           <section className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
             <div>
-              <p className="mb-2 text-sm text-teal-400">WELCOME BACK</p>
+              <p className="mb-2 text-sm text-teal-400">
+                {t("welcomeBack")}
+              </p>
               <h2 className="text-2xl font-bold sm:text-3xl">
-                Hello, Traveler!
+                {t("helloTraveler")}
               </h2>
               <p className="mt-2 text-sm text-slate-400">
-                Stay informed, stay prepared, and travel safely.
+                {t("travelSafely")}
               </p>
             </div>
 
@@ -170,7 +176,7 @@ function Dashboard() {
               className="flex items-center justify-center gap-2 rounded-xl bg-teal-400 px-5 py-3 font-semibold text-slate-950 transition hover:bg-teal-300"
             >
               <Plus size={19} />
-              Plan a Journey
+              {t("planJourney")}
             </button>
           </section>
 
@@ -182,16 +188,18 @@ function Dashboard() {
                   <ShieldCheck size={30} className="text-teal-400" />
                 </div>
                 <div>
-                  <p className="font-semibold">Safety Monitoring</p>
+                  <p className="font-semibold">
+                    {t("safetyMonitoring")}
+                  </p>
                   <p className="mt-1 text-sm text-slate-400">
-                    Your dashboard is ready for your next journey.
+                    {t("dashboardReady")}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 self-start rounded-full border border-teal-400/20 bg-teal-400/10 px-4 py-2 text-sm text-teal-400 sm:self-center">
                 <span className="h-2 w-2 rounded-full bg-teal-400"></span>
-                System Ready
+                {t("systemReady")}
               </div>
             </div>
           </section>
@@ -199,8 +207,12 @@ function Dashboard() {
           {/* Statistics cards */}
           <section>
             <div className="mb-5 flex items-center justify-between">
-              <h3 className="text-lg font-bold">Safety Overview</h3>
-              <span className="text-xs text-slate-500">Demo statistics</span>
+              <h3 className="text-lg font-bold">
+                {t("safetyOverview")}
+              </h3>
+              <span className="text-xs text-slate-500">
+                {t("demoStatistics")}
+              </span>
             </div>
 
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -221,7 +233,9 @@ function Dashboard() {
 
                     <p className="text-sm text-slate-400">{item.title}</p>
                     <h4 className="mt-2 text-2xl font-bold">{item.value}</h4>
-                    <p className="mt-2 text-xs text-slate-500">{item.subtitle}</p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {item.subtitle}
+                    </p>
                   </div>
                 );
               })}
@@ -230,7 +244,9 @@ function Dashboard() {
 
           {/* Quick actions */}
           <section>
-            <h3 className="mb-5 text-lg font-bold">Quick Actions</h3>
+            <h3 className="mb-5 text-lg font-bold">
+              {t("quickActions")}
+            </h3>
 
             <div className="grid gap-5 md:grid-cols-3">
               {quickActions.map((item) => {
@@ -250,7 +266,7 @@ function Dashboard() {
                       {item.description}
                     </p>
                     <span className="mt-5 flex items-center gap-2 text-sm font-semibold text-teal-400">
-                      Explore <ArrowUpRight size={16} />
+                      {t("explore")} <ArrowUpRight size={16} />
                     </span>
                   </button>
                 );
@@ -261,7 +277,9 @@ function Dashboard() {
           {/* Recent activities */}
           <section className="rounded-2xl border border-white/10 bg-slate-900 p-6">
             <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-lg font-bold">Recent Activities</h3>
+              <h3 className="text-lg font-bold">
+                {t("recentActivities")}
+              </h3>
               <Activity size={20} className="text-teal-400" />
             </div>
 
@@ -293,7 +311,7 @@ function Dashboard() {
 
           {/* Dashboard footer */}
           <footer className="border-t border-white/10 py-5 text-center text-xs text-slate-500">
-            Smart Tourist Safety | AI-Powered Tourist Protection System
+            {t("appName")} | {t("touristProtectionSystem")}
           </footer>
         </div>
       </main>

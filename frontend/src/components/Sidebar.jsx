@@ -1,5 +1,6 @@
 
 import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   LayoutDashboard,
   Map,
@@ -18,23 +19,24 @@ import {
 } from "lucide-react";
 
 const menuItems = [
-  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { name: "My Trips", path: "/trips", icon: Map },
-  { name: "Safe Routes", path: "/safe-routes", icon: Route },
-  { name: "Emergency SOS", path: "/emergency", icon: ShieldAlert },
-  { name: "AI Risk Dashboard", path: "/ai-risk-dashboard", icon: BrainCircuit },
-  { name: "AI Safety Assistant", path: "/safety-assistant", icon: Bot },
-  { name: "Notifications", path: "/notifications", icon: Bell },
-  { name: "Digital Tourist ID", path: "/digital-id", icon: Fingerprint },
-  { name: "My Documents", path: "/documents", icon: FileText },
-  { name: "My Profile", path: "/profile", icon: User },
-  { name: "Settings", path: "/settings", icon: Settings },
+  { key: "dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { key: "myTrips", path: "/trips", icon: Map },
+  { key: "safeRoutes", path: "/safe-routes", icon: Route },
+  { key: "emergency", path: "/emergency", icon: ShieldAlert },
+  { key: "aiRiskDashboard", path: "/ai-risk-dashboard", icon: BrainCircuit },
+  { key: "safetyAssistant", path: "/safety-assistant", icon: Bot },
+  { key: "notifications", path: "/notifications", icon: Bell },
+  { key: "digitalId", path: "/digital-id", icon: Fingerprint },
+  { key: "documents", path: "/documents", icon: FileText },
+  { key: "profile", path: "/profile", icon: User },
+  { key: "settings", path: "/settings", icon: Settings },
 ];
 
 function Sidebar({ isOpen = true, onClose }) {
+  const { t } = useTranslation();
+
   return (
     <>
-      {/* Mobile sidebar backdrop */}
       {isOpen && (
         <div
           onClick={onClose}
@@ -52,14 +54,14 @@ function Sidebar({ isOpen = true, onClose }) {
           <NavLink to="/" className="flex items-center gap-3">
             <ShieldCheck size={32} className="text-teal-400" />
             <span className="text-lg font-bold">
-              Smart Tourist <span className="text-teal-400">Safety</span>
+              {t("appName")}
             </span>
           </NavLink>
 
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-white lg:hidden"
-            aria-label="Close sidebar"
+            aria-label={t("closeMenu")}
           >
             <X size={22} />
           </button>
@@ -68,7 +70,7 @@ function Sidebar({ isOpen = true, onClose }) {
         {/* Navigation menu */}
         <nav className="flex-1 space-y-2 overflow-y-auto px-4 py-7">
           <p className="mb-4 px-3 text-xs font-semibold uppercase tracking-widest text-slate-500">
-            Main Menu
+            {t("mainMenu")}
           </p>
 
           {menuItems.map((item) => {
@@ -88,7 +90,7 @@ function Sidebar({ isOpen = true, onClose }) {
                 }
               >
                 <Icon size={20} />
-                {item.name}
+                {t(item.key)}
               </NavLink>
             );
           })}
@@ -101,8 +103,8 @@ function Sidebar({ isOpen = true, onClose }) {
               <User size={22} />
             </div>
             <div>
-              <p className="text-sm font-semibold">Tourist User</p>
-              <p className="text-xs text-slate-500">Traveler Account</p>
+              <p className="text-sm font-semibold">{t("touristUser")}</p>
+              <p className="text-xs text-slate-500">{t("travelerAccount")}</p>
             </div>
           </div>
 
@@ -112,7 +114,7 @@ function Sidebar({ isOpen = true, onClose }) {
             className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-slate-400 transition hover:bg-red-500/10 hover:text-red-400"
           >
             <LogOut size={19} />
-            Logout
+            {t("logout")}
           </NavLink>
         </div>
       </aside>

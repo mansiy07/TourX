@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Menu,
   User,
@@ -17,6 +18,7 @@ import {
 import Sidebar from "../components/Sidebar";
 
 function Profile() {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -48,6 +50,11 @@ function Profile() {
     setSaved(true);
   };
 
+  const handleEditToggle = () => {
+    setIsEditing((current) => !current);
+    setSaved(false);
+  };
+
   const inputClass =
     "w-full rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-teal-400 disabled:cursor-not-allowed disabled:opacity-70";
 
@@ -65,21 +72,22 @@ function Profile() {
             <button
               onClick={() => setSidebarOpen(true)}
               className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 lg:hidden"
-              aria-label="Open sidebar"
+              aria-label={t("openSidebar")}
             >
               <Menu size={22} />
             </button>
+
             <div>
-              <h1 className="text-xl font-bold">My Profile</h1>
+              <h1 className="text-xl font-bold">{t("profile")}</h1>
               <p className="text-xs text-slate-400">
-                Manage your personal information
+                {t("managePersonalInformation")}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 rounded-full border border-teal-400/20 bg-teal-400/10 px-3 py-2 text-xs text-teal-400">
             <ShieldCheck size={15} />
-            Tourist Account
+            {t("touristAccount")}
           </div>
         </header>
 
@@ -87,13 +95,13 @@ function Profile() {
           {/* Page introduction */}
           <section>
             <p className="mb-2 text-sm font-semibold tracking-widest text-teal-400">
-              ACCOUNT SETTINGS
+              {t("accountSettings").toUpperCase()}
             </p>
             <h2 className="text-2xl font-bold sm:text-3xl">
-              Personal Profile
+              {t("personalProfile")}
             </h2>
             <p className="mt-2 text-sm text-slate-400">
-              Keep your information updated for a better travel experience.
+              {t("profileIntroduction")}
             </p>
           </section>
 
@@ -105,7 +113,8 @@ function Profile() {
                 <button
                   type="button"
                   disabled
-                  title="Photo upload will be added later"
+                  title={t("photoUploadPending")}
+                  aria-label={t("photoUploadPending")}
                   className="absolute bottom-0 right-0 rounded-full border-2 border-slate-900 bg-teal-400 p-2 text-slate-950"
                 >
                   <Camera size={14} />
@@ -114,27 +123,24 @@ function Profile() {
 
               <div className="text-center sm:text-left">
                 <h3 className="text-2xl font-bold">
-                  {profile.fullName || "Your Name"}
+                  {profile.fullName || t("yourName")}
                 </h3>
                 <p className="mt-1 text-sm text-slate-400">
-                  {profile.email || "Add your email address"}
+                  {profile.email || t("addEmailAddress")}
                 </p>
                 <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-teal-400/10 px-3 py-1.5 text-xs text-teal-400">
                   <ShieldCheck size={14} />
-                  Tourist Profile
+                  {t("touristProfile")}
                 </div>
               </div>
 
               <div className="sm:ml-auto">
                 <button
-                  onClick={() => {
-                    setIsEditing(!isEditing);
-                    setSaved(false);
-                  }}
+                  onClick={handleEditToggle}
                   className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm font-semibold transition hover:border-teal-400/40"
                 >
                   <Pencil size={16} />
-                  {isEditing ? "Cancel Editing" : "Edit Profile"}
+                  {isEditing ? t("cancelEditing") : t("editProfile")}
                 </button>
               </div>
             </div>
@@ -147,9 +153,11 @@ function Profile() {
           >
             <div className="mb-7 flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-lg font-bold">Personal Information</h3>
+                <h3 className="text-lg font-bold">
+                  {t("personalInformation")}
+                </h3>
                 <p className="mt-1 text-sm text-slate-400">
-                  Your basic account details.
+                  {t("basicAccountDetails")}
                 </p>
               </div>
               <User size={22} className="text-teal-400" />
@@ -158,7 +166,7 @@ function Profile() {
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm text-slate-300">
-                  Full Name
+                  {t("fullName")}
                 </label>
                 <div className="relative">
                   <User
@@ -172,14 +180,14 @@ function Profile() {
                     disabled={!isEditing}
                     required
                     className={`${inputClass} pl-11`}
-                    placeholder="Enter your full name"
+                    placeholder={t("enterFullName")}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="mb-2 block text-sm text-slate-300">
-                  Email Address
+                  {t("emailAddress")}
                 </label>
                 <div className="relative">
                   <Mail
@@ -194,14 +202,14 @@ function Profile() {
                     disabled={!isEditing}
                     required
                     className={`${inputClass} pl-11`}
-                    placeholder="Enter your email"
+                    placeholder={t("enterEmail")}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="mb-2 block text-sm text-slate-300">
-                  Phone Number
+                  {t("phoneNumber")}
                 </label>
                 <div className="relative">
                   <Phone
@@ -215,14 +223,14 @@ function Profile() {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className={`${inputClass} pl-11`}
-                    placeholder="Enter phone number"
+                    placeholder={t("enterPhoneNumber")}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="mb-2 block text-sm text-slate-300">
-                  Location
+                  {t("location")}
                 </label>
                 <div className="relative">
                   <MapPin
@@ -235,14 +243,14 @@ function Profile() {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className={`${inputClass} pl-11`}
-                    placeholder="Enter your city"
+                    placeholder={t("enterCity")}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="mb-2 block text-sm text-slate-300">
-                  Nationality
+                  {t("nationality")}
                 </label>
                 <div className="relative">
                   <Globe
@@ -255,14 +263,14 @@ function Profile() {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className={`${inputClass} pl-11`}
-                    placeholder="Enter nationality"
+                    placeholder={t("enterNationality")}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="mb-2 block text-sm text-slate-300">
-                  Occupation
+                  {t("occupation")}
                 </label>
                 <div className="relative">
                   <BriefcaseBusiness
@@ -275,14 +283,14 @@ function Profile() {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className={`${inputClass} pl-11`}
-                    placeholder="Enter occupation"
+                    placeholder={t("enterOccupation")}
                   />
                 </div>
               </div>
 
               <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm text-slate-300">
-                  About Me
+                  {t("aboutMe")}
                 </label>
                 <textarea
                   name="bio"
@@ -291,14 +299,14 @@ function Profile() {
                   disabled={!isEditing}
                   rows={4}
                   className={inputClass}
-                  placeholder="Write something about yourself..."
+                  placeholder={t("writeAboutYourself")}
                 />
               </div>
             </div>
 
             {saved && (
               <p className="mt-5 text-sm font-medium text-teal-400">
-                Profile updated in this demo session.
+                {t("profileUpdatedDemo")}
               </p>
             )}
 
@@ -309,7 +317,7 @@ function Profile() {
                   className="flex items-center gap-2 rounded-xl bg-teal-400 px-6 py-3 text-sm font-bold text-slate-950 transition hover:bg-teal-300"
                 >
                   <Save size={17} />
-                  Save Changes
+                  {t("saveChanges")}
                 </button>
               </div>
             )}
@@ -317,9 +325,11 @@ function Profile() {
 
           {/* Account information */}
           <section className="rounded-2xl border border-white/10 bg-slate-900 p-6 sm:p-8">
-            <h3 className="text-lg font-bold">Account Information</h3>
+            <h3 className="text-lg font-bold">
+              {t("accountInformation")}
+            </h3>
             <p className="mt-1 text-sm text-slate-400">
-              Additional account details and security.
+              {t("additionalAccountDetails")}
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -328,9 +338,11 @@ function Profile() {
                   <ShieldCheck size={22} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold">Account Security</p>
+                  <p className="text-sm font-semibold">
+                    {t("accountSecurity")}
+                  </p>
                   <p className="mt-1 text-xs text-slate-500">
-                    Authentication integration pending
+                    {t("authenticationPending")}
                   </p>
                 </div>
               </div>
@@ -340,9 +352,11 @@ function Profile() {
                   <Calendar size={22} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold">Member Since</p>
+                  <p className="text-sm font-semibold">
+                    {t("memberSince")}
+                  </p>
                   <p className="mt-1 text-xs text-slate-500">
-                    Will be available after registration integration
+                    {t("registrationIntegrationPending")}
                   </p>
                 </div>
               </div>
@@ -350,8 +364,7 @@ function Profile() {
           </section>
 
           <p className="border-t border-white/10 py-5 text-center text-xs text-slate-500">
-            Profile changes are currently stored only in the frontend session.
-            Database integration will be added later.
+            {t("profileStorageDisclaimer")}
           </p>
         </div>
       </main>

@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Menu,
   Bell,
@@ -18,47 +19,48 @@ import Sidebar from "../components/Sidebar";
 const initialNotifications = [
   {
     id: 1,
-    title: "Emergency Alert",
-    message: "This is a sample emergency notification for the demo interface.",
-    time: "10 minutes ago",
+    title: "emergencyAlert",
+    message: "emergencyAlertMessage",
+    time: "tenMinutesAgo",
     type: "emergency",
     read: false,
   },
   {
     id: 2,
-    title: "Route Safety Update",
-    message: "A sample route safety update is available for your planned trip.",
-    time: "30 minutes ago",
+    title: "routeSafetyUpdate",
+    message: "routeSafetyUpdateMessage",
+    time: "thirtyMinutesAgo",
     type: "route",
     read: false,
   },
   {
     id: 3,
-    title: "Moderate Risk Indicator",
-    message: "A demo location has been assigned a moderate risk level.",
-    time: "1 hour ago",
+    title: "moderateRiskIndicator",
+    message: "moderateRiskIndicatorMessage",
+    time: "oneHourAgo",
     type: "warning",
     read: true,
   },
   {
     id: 4,
-    title: "Trip Reminder",
-    message: "Remember to review your travel plan before starting your trip.",
-    time: "Yesterday",
+    title: "tripReminder",
+    message: "tripReminderMessage",
+    time: "yesterday",
     type: "info",
     read: true,
   },
   {
     id: 5,
-    title: "Profile Updated",
-    message: "Your profile was updated in the demo session.",
-    time: "Yesterday",
+    title: "profileUpdated",
+    message: "profileUpdatedMessage",
+    time: "yesterday",
     type: "success",
     read: true,
   },
 ];
 
 function Notifications() {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
   const [filter, setFilter] = useState("All");
@@ -144,14 +146,14 @@ function Notifications() {
             <button
               onClick={() => setSidebarOpen(true)}
               className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 lg:hidden"
-              aria-label="Open sidebar"
+              aria-label={t("openSidebar")}
             >
               <Menu size={22} />
             </button>
             <div>
-              <h1 className="text-xl font-bold">Notifications</h1>
+              <h1 className="text-xl font-bold">{t("notifications")}</h1>
               <p className="text-xs text-slate-400">
-                Stay informed about your travel safety
+                {t("notificationsSubtitle")}
               </p>
             </div>
           </div>
@@ -170,34 +172,36 @@ function Notifications() {
           {/* Introduction */}
           <section>
             <p className="mb-2 text-sm font-semibold tracking-widest text-teal-400">
-              NOTIFICATION CENTER
+              {t("notificationCenter")}
             </p>
             <h2 className="text-2xl font-bold sm:text-3xl">
-              Your Updates
+              {t("yourUpdates")}
             </h2>
             <p className="mt-2 text-sm text-slate-400">
-              Review safety alerts, travel updates and account notifications.
+              {t("yourUpdatesDescription")}
             </p>
           </section>
 
           {/* Notification summary */}
           <section className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
-              <p className="text-sm text-slate-400">Total Notifications</p>
+              <p className="text-sm text-slate-400">
+                {t("totalNotifications")}
+              </p>
               <h3 className="mt-3 text-3xl font-bold">
                 {notifications.length}
               </h3>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
-              <p className="text-sm text-slate-400">Unread</p>
+              <p className="text-sm text-slate-400">{t("unread")}</p>
               <h3 className="mt-3 text-3xl font-bold text-teal-400">
                 {unreadCount}
               </h3>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
-              <p className="text-sm text-slate-400">Read</p>
+              <p className="text-sm text-slate-400">{t("read")}</p>
               <h3 className="mt-3 text-3xl font-bold">
                 {notifications.length - unreadCount}
               </h3>
@@ -208,9 +212,9 @@ function Notifications() {
           <section className="rounded-2xl border border-white/10 bg-slate-900 p-5 sm:p-6">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
-                <h3 className="font-bold">All Notifications</h3>
+                <h3 className="font-bold">{t("allNotifications")}</h3>
                 <p className="mt-1 text-xs text-slate-400">
-                  Manage your notification history.
+                  {t("manageNotificationHistory")}
                 </p>
               </div>
 
@@ -221,7 +225,7 @@ function Notifications() {
                   className="flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-300 transition hover:border-teal-400/40 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <CheckCheck size={15} />
-                  Mark All Read
+                  {t("markAllRead")}
                 </button>
 
                 <button
@@ -230,7 +234,7 @@ function Notifications() {
                   className="flex items-center gap-2 rounded-xl border border-red-400/20 px-3 py-2 text-xs text-red-400 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Trash2 size={15} />
-                  Clear All
+                  {t("clearAll")}
                 </button>
               </div>
             </div>
@@ -247,7 +251,7 @@ function Notifications() {
                       : "bg-slate-950 text-slate-400 hover:text-white"
                   }`}
                 >
-                  {item}
+                  {t(item.toLowerCase())}
                 </button>
               ))}
             </div>
@@ -257,9 +261,11 @@ function Notifications() {
               {filteredNotifications.length === 0 ? (
                 <div className="py-12 text-center">
                   <Bell size={35} className="mx-auto text-slate-600" />
-                  <p className="mt-4 font-semibold">No notifications found</p>
+                  <p className="mt-4 font-semibold">
+                    {t("noNotificationsFound")}
+                  </p>
                   <p className="mt-2 text-sm text-slate-500">
-                    Your selected notification list is empty.
+                    {t("emptyNotificationList")}
                   </p>
                 </div>
               ) : (
@@ -285,7 +291,7 @@ function Notifications() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <h4 className="text-sm font-bold">
-                            {notification.title}
+                            {t(notification.title)}
                           </h4>
                           {!notification.read && (
                             <span className="h-2 w-2 rounded-full bg-teal-400" />
@@ -293,12 +299,12 @@ function Notifications() {
                         </div>
 
                         <p className="mt-2 text-sm leading-6 text-slate-400">
-                          {notification.message}
+                          {t(notification.message)}
                         </p>
 
                         <p className="mt-3 flex items-center gap-2 text-xs text-slate-500">
                           <Clock size={13} />
-                          {notification.time}
+                          {t(notification.time)}
                         </p>
                       </div>
 
@@ -308,13 +314,13 @@ function Notifications() {
                             onClick={() => markAsRead(notification.id)}
                             className="rounded-lg px-3 py-2 text-xs text-teal-400 hover:bg-teal-400/10"
                           >
-                            Mark Read
+                            {t("markRead")}
                           </button>
                         )}
 
                         <button
                           onClick={() => deleteNotification(notification.id)}
-                          aria-label="Delete notification"
+                          aria-label={t("deleteNotification")}
                           className="rounded-lg p-2 text-slate-500 hover:bg-red-400/10 hover:text-red-400"
                         >
                           <Trash2 size={17} />
@@ -330,9 +336,7 @@ function Notifications() {
           <div className="flex items-start gap-3 rounded-2xl border border-orange-400/20 bg-orange-400/5 p-5">
             <MapPin size={21} className="mt-0.5 shrink-0 text-orange-400" />
             <p className="text-xs leading-6 text-slate-400">
-              These are sample notifications. Real-time push notifications,
-              emergency alerts and server synchronization will be integrated
-              with the backend later.
+              {t("notificationDemoDisclaimer")}
             </p>
           </div>
         </div>

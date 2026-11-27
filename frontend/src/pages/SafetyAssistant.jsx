@@ -1,12 +1,12 @@
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Menu,
   Bot,
   Send,
   User,
   ShieldCheck,
-  MapPin,
   AlertTriangle,
   Route,
   Sparkles,
@@ -15,23 +15,22 @@ import {
 import Sidebar from "../components/Sidebar";
 
 const suggestions = [
-  "How can I stay safe while travelling?",
-  "What should I do during an emergency?",
-  "How can I identify an unsafe location?",
-  "Give me some solo travel safety tips.",
-];
-
-const initialMessages = [
-  {
-    id: 1,
-    sender: "assistant",
-    text: "Hello! I am your Smart Tourist Safety Assistant. You can ask me about travel safety, emergency preparedness and general safety tips. How can I help you?",
-  },
+  "suggestionTravelSafety",
+  "suggestionEmergency",
+  "suggestionUnsafeLocation",
+  "suggestionSoloTravel",
 ];
 
 function SafetyAssistant() {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      sender: "assistant",
+      text: t("assistantWelcome"),
+    },
+  ]);
   const [input, setInput] = useState("");
 
   // Generate a demo response based on the user's message.
@@ -39,22 +38,26 @@ function SafetyAssistant() {
     const text = message.toLowerCase();
 
     if (text.includes("emergency") || text.includes("help")) {
-      return "If you are in immediate danger, contact local emergency services. Move to a safe and public location if possible, share your location with a trusted contact, and use the SOS feature in the application. Never wait for an AI response before seeking emergency help.";
+      return t("assistantEmergencyResponse");
     }
 
     if (text.includes("solo") || text.includes("alone")) {
-      return "For solo travel, share your itinerary with someone you trust, keep your phone charged, use well-lit public routes, verify your accommodation and avoid sharing live travel details with strangers.";
+      return t("assistantSoloTravelResponse");
     }
 
-    if (text.includes("location") || text.includes("area") || text.includes("unsafe")) {
-      return "Before visiting an unfamiliar location, check local safety advisories, recent reports, lighting, public transport access and nearby emergency services. This demo cannot verify the live safety status of any location.";
+    if (
+      text.includes("location") ||
+      text.includes("area") ||
+      text.includes("unsafe")
+    ) {
+      return t("assistantLocationResponse");
     }
 
     if (text.includes("route") || text.includes("travel")) {
-      return "Plan your route in advance, prefer well-lit and populated roads, keep your navigation active and share your trip details with a trusted contact. Live route risk analysis will be integrated later.";
+      return t("assistantTravelResponse");
     }
 
-    return "That is a good safety question. Stay aware of your surroundings, keep emergency contacts accessible and follow verified local safety guidance. Live AI-powered assistance will be available after backend integration.";
+    return t("assistantDefaultResponse");
   };
 
   // Add a user message and its demo response.
@@ -81,7 +84,13 @@ function SafetyAssistant() {
 
   // Clear the current conversation.
   const clearChat = () => {
-    setMessages(initialMessages);
+    setMessages([
+      {
+        id: Date.now(),
+        sender: "assistant",
+        text: t("assistantWelcome"),
+      },
+    ]);
   };
 
   return (
@@ -98,14 +107,16 @@ function SafetyAssistant() {
             <button
               onClick={() => setSidebarOpen(true)}
               className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 lg:hidden"
-              aria-label="Open sidebar"
+              aria-label={t("openSidebar")}
             >
               <Menu size={22} />
             </button>
             <div>
-              <h1 className="text-xl font-bold">AI Safety Assistant</h1>
+              <h1 className="text-xl font-bold">
+                {t("safetyAssistant")}
+              </h1>
               <p className="text-xs text-slate-400">
-                Your travel safety companion
+                {t("safetyAssistantSubtitle")}
               </p>
             </div>
           </div>
@@ -113,7 +124,7 @@ function SafetyAssistant() {
           <div className="flex items-center gap-2 rounded-full border border-teal-400/20 bg-teal-400/10 px-3 py-2">
             <span className="h-2 w-2 rounded-full bg-teal-400" />
             <span className="text-xs font-medium text-teal-400">
-              Demo Mode
+              {t("demoMode")}
             </span>
           </div>
         </header>
@@ -122,14 +133,13 @@ function SafetyAssistant() {
           {/* Introduction */}
           <section>
             <p className="mb-2 text-sm font-semibold tracking-widest text-teal-400">
-              SMART TRAVEL ASSISTANCE
+              {t("smartTravelAssistance")}
             </p>
             <h2 className="text-2xl font-bold sm:text-3xl">
-              How can I help you stay safe?
+              {t("howCanIHelpYouStaySafe")}
             </h2>
             <p className="mt-2 text-sm text-slate-400">
-              Ask questions about travel safety, emergency preparedness and
-              responsible travelling.
+              {t("safetyAssistantIntroduction")}
             </p>
           </section>
 
@@ -137,25 +147,31 @@ function SafetyAssistant() {
           <section className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
               <ShieldCheck className="mb-3 text-teal-400" size={25} />
-              <h3 className="font-semibold">Safety Guidance</h3>
+              <h3 className="font-semibold">
+                {t("safetyGuidance")}
+              </h3>
               <p className="mt-2 text-xs leading-5 text-slate-400">
-                Get general tips for safer travelling.
+                {t("safetyGuidanceDescription")}
               </p>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
               <Route className="mb-3 text-blue-400" size={25} />
-              <h3 className="font-semibold">Travel Planning</h3>
+              <h3 className="font-semibold">
+                {t("travelPlanning")}
+              </h3>
               <p className="mt-2 text-xs leading-5 text-slate-400">
-                Learn how to prepare for your journey.
+                {t("travelPlanningDescription")}
               </p>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
               <AlertTriangle className="mb-3 text-orange-400" size={25} />
-              <h3 className="font-semibold">Emergency Guidance</h3>
+              <h3 className="font-semibold">
+                {t("emergencyGuidance")}
+              </h3>
               <p className="mt-2 text-xs leading-5 text-slate-400">
-                Understand basic emergency precautions.
+                {t("emergencyGuidanceDescription")}
               </p>
             </div>
           </section>
@@ -168,9 +184,11 @@ function SafetyAssistant() {
                   <Bot size={24} />
                 </div>
                 <div>
-                  <h3 className="font-bold">Safety Assistant</h3>
+                  <h3 className="font-bold">
+                    {t("safetyAssistant")}
+                  </h3>
                   <p className="text-xs text-slate-400">
-                    Travel support chatbot
+                    {t("travelSupportChatbot")}
                   </p>
                 </div>
               </div>
@@ -180,7 +198,7 @@ function SafetyAssistant() {
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-400 transition hover:bg-red-400/10 hover:text-red-400"
               >
                 <Trash2 size={15} />
-                Clear Chat
+                {t("clearChat")}
               </button>
             </div>
 
@@ -229,17 +247,17 @@ function SafetyAssistant() {
               <div className="border-t border-white/10 px-5 py-5 sm:px-7">
                 <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-slate-400">
                   <Sparkles size={15} className="text-teal-400" />
-                  TRY ASKING
+                  {t("tryAsking")}
                 </div>
 
                 <div className="flex flex-wrap gap-2">
                   {suggestions.map((suggestion) => (
                     <button
                       key={suggestion}
-                      onClick={() => sendMessage(suggestion)}
+                      onClick={() => sendMessage(t(suggestion))}
                       className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-left text-xs text-slate-300 transition hover:border-teal-400/40 hover:text-teal-400"
                     >
-                      {suggestion}
+                      {t(suggestion)}
                     </button>
                   ))}
                 </div>
@@ -258,7 +276,7 @@ function SafetyAssistant() {
                 type="text"
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
-                placeholder="Ask something about travel safety..."
+                placeholder={t("askTravelSafety")}
                 className="min-w-0 flex-1 rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-teal-400/50"
               />
 
@@ -266,7 +284,7 @@ function SafetyAssistant() {
                 type="submit"
                 disabled={!input.trim()}
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-400 text-slate-950 transition hover:bg-teal-300 disabled:cursor-not-allowed disabled:opacity-40"
-                aria-label="Send message"
+                aria-label={t("sendMessage")}
               >
                 <Send size={19} />
               </button>
@@ -280,10 +298,7 @@ function SafetyAssistant() {
               className="mt-0.5 shrink-0 text-orange-400"
             />
             <p className="text-xs leading-6 text-slate-400">
-              This is a demonstration chatbot with predefined responses. It
-              does not access live location, verify real-time threats or
-              contact emergency services. In an actual emergency, contact
-              local emergency services immediately.
+              {t("safetyAssistantDisclaimer")}
             </p>
           </div>
         </div>

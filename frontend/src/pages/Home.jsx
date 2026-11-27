@@ -12,49 +12,64 @@ import {
   LockKeyhole,
   Globe2,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 const features = [
   {
     icon: Siren,
-    title: "Instant SOS Alerts",
-    description:
-      "Send emergency alerts with your live location to registered contacts and response teams.",
+    title: "instantSosAlerts",
+    description: "instantSosAlertsDescription",
   },
   {
     icon: MapPin,
-    title: "Real-Time GPS Tracking",
-    description:
-      "Monitor tourist locations and provide location-based safety assistance.",
+    title: "realTimeGpsTracking",
+    description: "realTimeGpsTrackingDescription",
   },
   {
     icon: BrainCircuit,
-    title: "AI Risk Prediction",
-    description:
-      "Analyse location patterns and surrounding risk factors to identify potential safety threats.",
+    title: "aiRiskPrediction",
+    description: "aiRiskPredictionDescription",
   },
   {
     icon: Route,
-    title: "Smart Safe Routes",
-    description:
-      "Identify potentially risky routes and recommend safer travel alternatives.",
+    title: "smartSafeRoutes",
+    description: "smartSafeRoutesDescription",
   },
   {
     icon: Activity,
-    title: "Anomaly Detection",
-    description:
-      "Detect unusual movement patterns and unexpected deviations during a trip.",
+    title: "anomalyDetection",
+    description: "anomalyDetectionDescription",
   },
   {
     icon: Fingerprint,
-    title: "Blockchain Security",
-    description:
-      "Use verifiable digital identity and tamper-evident incident records.",
+    title: "blockchainSecurity",
+    description: "blockchainSecurityDescription",
   },
 ];
 
 function Home() {
+  const { t } = useTranslation();
+
+  const steps = [
+    {
+      number: "01",
+      title: "registerAndPlan",
+      description: "registerAndPlanDescription",
+    },
+    {
+      number: "02",
+      title: "monitorAndAnalyse",
+      description: "monitorAndAnalyseDescription",
+    },
+    {
+      number: "03",
+      title: "alertAndRespond",
+      description: "alertAndRespondDescription",
+    },
+  ];
+
   return (
     <div className="min-h-screen w-full bg-slate-950 text-white">
       <Navbar />
@@ -74,20 +89,18 @@ function Home() {
             <div className="w-full">
               <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-teal-400/30 bg-teal-400/10 px-4 py-2 text-sm text-teal-300">
                 <Radio size={16} />
-                Intelligent Tourist Safety System
+                {t("intelligentTouristSafetySystem")}
               </div>
 
               <h1 className="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl xl:text-7xl">
-                Explore Freely.
+                {t("exploreFreely")}
                 <span className="mt-2 block text-teal-400">
-                  Travel Safely.
+                  {t("travelSafelyHero")}
                 </span>
               </h1>
 
               <p className="mt-6 max-w-xl text-base leading-8 text-slate-400 sm:text-lg">
-                An AI-powered smart tourist safety platform designed to
-                monitor travel risks, detect unusual activities and provide
-                faster emergency assistance.
+                {t("homeHeroDescription")}
               </p>
 
               {/* Hero Action Buttons */}
@@ -96,7 +109,7 @@ function Home() {
                   href="/register"
                   className="inline-flex items-center gap-2 rounded-xl bg-teal-400 px-6 py-3.5 font-semibold text-slate-950 transition hover:bg-teal-300 sm:px-7"
                 >
-                  Start Your Journey
+                  {t("startYourJourney")}
                   <ArrowRight size={19} />
                 </a>
 
@@ -104,7 +117,7 @@ function Home() {
                   href="#features"
                   className="inline-flex items-center rounded-xl border border-white/15 px-6 py-3.5 text-white transition hover:border-teal-400 hover:text-teal-400 sm:px-7"
                 >
-                  Explore Features
+                  {t("exploreFeatures")}
                 </a>
               </div>
 
@@ -113,21 +126,21 @@ function Home() {
                 <div>
                   <h3 className="text-2xl font-bold text-teal-400">AI</h3>
                   <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-                    Risk Intelligence
+                    {t("riskIntelligence")}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="text-2xl font-bold text-teal-400">GPS</h3>
                   <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-                    Live Monitoring
+                    {t("liveMonitoring")}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="text-2xl font-bold text-teal-400">Web3</h3>
                   <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-                    Data Integrity
+                    {t("dataIntegrity")}
                   </p>
                 </div>
               </div>
@@ -141,16 +154,16 @@ function Home() {
                 <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="text-sm text-slate-400">
-                      Safety Overview
+                      {t("safetyOverview")}
                     </p>
                     <h3 className="mt-1 text-xl font-semibold">
-                      Tourist Monitoring
+                      {t("touristMonitoring")}
                     </h3>
                   </div>
 
                   <span className="inline-flex items-center gap-2 rounded-full bg-teal-400/10 px-3 py-2 text-xs text-teal-300">
                     <span className="h-2 w-2 animate-pulse rounded-full bg-teal-400" />
-                    Demo Preview
+                    {t("demoPreview")}
                   </span>
                 </div>
 
@@ -180,7 +193,7 @@ function Home() {
 
                   <div className="absolute bottom-4 left-4 rounded-lg border border-white/10 bg-slate-950/80 px-3 py-2 text-xs text-slate-300">
                     <MapPin size={13} className="mr-1 inline text-teal-400" />
-                    Location preview
+                    {t("locationPreview")}
                   </div>
                 </div>
 
@@ -189,26 +202,26 @@ function Home() {
                   <div className="rounded-xl bg-slate-800/80 p-3 sm:p-4">
                     <div className="flex items-center gap-2 text-xs text-slate-400">
                       <ShieldCheck size={16} className="text-teal-400" />
-                      Safety System
+                      {t("safetySystem")}
                     </div>
                     <p className="mt-2 text-base font-semibold sm:text-lg">
-                      AI Enabled
+                      {t("aiEnabled")}
                     </p>
                   </div>
 
                   <div className="rounded-xl bg-slate-800/80 p-3 sm:p-4">
                     <div className="flex items-center gap-2 text-xs text-slate-400">
                       <LockKeyhole size={16} className="text-teal-400" />
-                      Data Security
+                      {t("dataSecurity")}
                     </div>
                     <p className="mt-2 text-base font-semibold sm:text-lg">
-                      Protected
+                      {t("protected")}
                     </p>
                   </div>
                 </div>
 
                 <p className="mt-4 text-center text-xs text-slate-500">
-                  Illustrative interface preview — not live tracking data.
+                  {t("illustrativePreviewDisclaimer")}
                 </p>
               </div>
             </div>
@@ -220,17 +233,18 @@ function Home() {
           <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
             <div className="mx-auto mb-14 max-w-2xl text-center sm:mb-16">
               <p className="text-sm font-semibold uppercase tracking-widest text-teal-400">
-                Our Capabilities
+                {t("ourCapabilities")}
               </p>
 
               <h2 className="mt-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-                Safety Features Built for{" "}
-                <span className="text-teal-400">Every Journey</span>
+                {t("safetyFeaturesBuiltFor")}{" "}
+                <span className="text-teal-400">
+                  {t("everyJourney")}
+                </span>
               </h2>
 
               <p className="mt-5 leading-7 text-slate-400">
-                A connected safety ecosystem combining intelligent monitoring,
-                emergency response and secure digital records.
+                {t("homeFeaturesDescription")}
               </p>
             </div>
 
@@ -248,11 +262,11 @@ function Home() {
                     </div>
 
                     <h3 className="mt-6 text-xl font-semibold">
-                      {feature.title}
+                      {t(feature.title)}
                     </h3>
 
                     <p className="mt-3 leading-7 text-slate-400">
-                      {feature.description}
+                      {t(feature.description)}
                     </p>
                   </div>
                 );
@@ -266,43 +280,31 @@ function Home() {
           <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-sm font-semibold uppercase tracking-widest text-teal-400">
-                Simple Process
+                {t("simpleProcess")}
               </p>
 
               <h2 className="mt-4 text-3xl font-bold sm:text-4xl">
-                How It <span className="text-teal-400">Works</span>
+                {t("howIt")} <span className="text-teal-400">{t("works")}</span>
               </h2>
             </div>
 
             <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
-              {[
-                [
-                  "01",
-                  "Register & Plan",
-                  "Create your tourist profile, add emergency contacts and plan your trip.",
-                ],
-                [
-                  "02",
-                  "Monitor & Analyse",
-                  "Location and travel signals are analysed for potential safety risks.",
-                ],
-                [
-                  "03",
-                  "Alert & Respond",
-                  "Receive safety alerts and get connected to emergency response support.",
-                ],
-              ].map((step) => (
+              {steps.map((step) => (
                 <div
-                  key={step[0]}
+                  key={step.number}
                   className="rounded-2xl border border-white/10 bg-slate-900 p-7 sm:p-8"
                 >
                   <span className="text-4xl font-bold text-teal-400/50">
-                    {step[0]}
+                    {step.number}
                   </span>
 
-                  <h3 className="mt-5 text-2xl font-semibold">{step[1]}</h3>
+                  <h3 className="mt-5 text-2xl font-semibold">
+                    {t(step.title)}
+                  </h3>
 
-                  <p className="mt-3 leading-7 text-slate-400">{step[2]}</p>
+                  <p className="mt-3 leading-7 text-slate-400">
+                    {t(step.description)}
+                  </p>
                 </div>
               ))}
             </div>
@@ -318,20 +320,18 @@ function Home() {
             <Globe2 size={42} className="mx-auto text-teal-400" />
 
             <h2 className="mt-6 text-3xl font-bold sm:text-4xl">
-              Travel With Confidence
+              {t("travelWithConfidence")}
             </h2>
 
             <p className="mx-auto mt-5 max-w-2xl leading-8 text-slate-400">
-              Bringing together AI-powered safety intelligence, real-time
-              location monitoring and blockchain-backed data integrity to
-              support safer tourism.
+              {t("homeAboutDescription")}
             </p>
 
             <a
               href="/register"
               className="mt-8 inline-flex items-center gap-2 rounded-xl bg-teal-400 px-7 py-4 font-semibold text-slate-950 transition hover:bg-teal-300"
             >
-              Get Started
+              {t("getStarted")}
               <ArrowRight size={18} />
             </a>
           </div>

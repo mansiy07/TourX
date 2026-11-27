@@ -1,5 +1,6 @@
 
 import { useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FileText,
   Upload,
@@ -20,19 +21,18 @@ import Sidebar from "../components/Sidebar";
 import { useTheme } from "../context/ThemeContext";
 
 const categories = [
-  "All Documents",
-  "Passport",
-  "Visa",
-  "Government ID",
-  "Driving Licence",
-  "Tickets",
-  "Hotel Bookings",
-  "Travel Insurance",
-  "Medical Documents",
-  "Other",
+  { value: "All Documents", key: "allDocuments" },
+  { value: "Passport", key: "passport" },
+  { value: "Visa", key: "visa" },
+  { value: "Government ID", key: "governmentId" },
+  { value: "Driving Licence", key: "drivingLicence" },
+  { value: "Tickets", key: "tickets" },
+  { value: "Hotel Bookings", key: "hotelBookings" },
+  { value: "Travel Insurance", key: "travelInsurance" },
+  { value: "Medical Documents", key: "medicalDocuments" },
+  { value: "Other", key: "other" },
 ];
 
-// Calculate the number of days remaining until document expiry.
 function getDaysRemaining(expiryDate) {
   if (!expiryDate) return null;
 
@@ -43,18 +43,18 @@ function getDaysRemaining(expiryDate) {
   return Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
 }
 
-// Return the current expiry status of a document.
 function getExpiryStatus(expiryDate) {
   const days = getDaysRemaining(expiryDate);
 
-  if (days === null) return { label: "No expiry date", color: "slate" };
-  if (days < 0) return { label: "Expired", color: "red" };
-  if (days <= 30) return { label: "Expiring Soon", color: "amber" };
+  if (days === null) return { label: "noExpiryDate", color: "slate" };
+  if (days < 0) return { label: "expired", color: "red" };
+  if (days <= 30) return { label: "expiringSoon", color: "amber" };
 
-  return { label: "Valid", color: "green" };
+  return { label: "valid", color: "green" };
 }
 
 function Documents() {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -77,7 +77,6 @@ function Documents() {
   const textClass = isDark ? "text-white" : "text-slate-900";
   const mutedClass = isDark ? "text-slate-400" : "text-slate-500";
 
-  // Filter documents using the selected category and search text.
   const filteredDocuments = useMemo(() => {
     return documents.filter((item) => {
       const matchesCategory =
@@ -101,7 +100,6 @@ function Documents() {
     return days !== null && days >= 0 && days <= 30;
   }).length;
 
-  // Handle document uploads with category and expiry information.
   const handleUpload = (event) => {
     const files = Array.from(event.target.files || []);
 
@@ -126,7 +124,6 @@ function Documents() {
     event.target.value = "";
   };
 
-  // Delete a document and release its temporary browser URL.
   const handleDelete = (id) => {
     const item = documents.find((doc) => doc.id === id);
 
@@ -143,7 +140,6 @@ function Documents() {
     }
   };
 
-  // Download the selected document.
   const handleDownload = (item) => {
     const link = window.document.createElement("a");
     link.href = item.url;
@@ -151,14 +147,12 @@ function Documents() {
     link.click();
   };
 
-  // Display an icon based on the uploaded file type.
   const getFileIcon = (type) => {
     if (type.startsWith("image/")) return <FileImage size={22} />;
     if (type === "application/pdf") return <FileText size={22} />;
     return <File size={22} />;
   };
 
-  // Display an expiry status with an appropriate color.
   const getStatusStyle = (color) => {
     const styles = {
       green: "bg-green-500/10 text-green-500",
@@ -170,6 +164,14 @@ function Documents() {
     };
 
     return styles[color];
+  };
+
+  const getExpiryMessage = (days) => {
+    if (days < 0) {
+      return t("expiredDaysAgo", { days: Math.abs(days) });
+    }
+    if (days === 0) return t("expiresToday");
+    return t("expiresInDays", { days });
   };
 
   return (
@@ -187,26 +189,26 @@ function Documents() {
           {/* Page heading */}
           <div className="mb-8">
             <p className="mb-2 text-sm font-medium text-teal-500">
-              TRAVEL DOCUMENT MANAGEMENT
+              {t("documentManagement").toUpperCase()}
             </p>
             <h1 className={`text-3xl font-bold ${textClass}`}>
-              My Documents
+              {t("myDocuments")}
             </h1>
             <p className={`mt-2 ${mutedClass}`}>
-              Keep your important travel documents organized in one place.
+              {t("documentsPageDescription")}
             </p>
           </div>
 
           {/* Upload controls */}
           <div className={`mb-8 rounded-2xl border p-5 ${cardClass}`}>
             <h2 className={`mb-4 text-lg font-semibold ${textClass}`}>
-              Upload a Document
+              {t("uploadDocument")}
             </h2>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div>
                 <label className={`mb-2 block text-sm ${mutedClass}`}>
-                  Document Category
+                  {t("documentCategory")}
                 </label>
                 <select
                   value={uploadCategory}
@@ -214,10 +216,10 @@ function Documents() {
                   className={`w-full rounded-xl border px-4 py-3 outline-none focus:border-teal-500 ${inputClass}`}
                 >
                   {categories
-                    .filter((category) => category !== "All Documents")
+                    .filter((category) => category.value !== "All Documents")
                     .map((category) => (
-                      <option key={category} value={category}>
-                        {category}
+                      <option key={category.value} value={category.value}>
+                        {t(category.key)}
                       </option>
                     ))}
                 </select>
@@ -225,7 +227,7 @@ function Documents() {
 
               <div>
                 <label className={`mb-2 block text-sm ${mutedClass}`}>
-                  Expiry Date (Optional)
+                  {t("expiryDateOptional")}
                 </label>
                 <input
                   type="date"
@@ -242,7 +244,7 @@ function Documents() {
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-500 px-5 py-3 font-semibold text-white transition hover:bg-teal-600"
                 >
                   <Upload size={19} />
-                  Upload Documents
+                  {t("uploadDocuments")}
                 </button>
               </div>
             </div>
@@ -257,7 +259,7 @@ function Documents() {
             />
 
             <p className={`mt-3 text-xs ${mutedClass}`}>
-              Supported formats: PDF, JPG, PNG and other image formats.
+              {t("supportedFileFormats")}
             </p>
           </div>
 
@@ -265,7 +267,9 @@ function Documents() {
           <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className={`rounded-2xl border p-5 ${cardClass}`}>
               <FolderOpen className="mb-3 text-teal-500" size={25} />
-              <p className={`text-sm ${mutedClass}`}>Total Documents</p>
+              <p className={`text-sm ${mutedClass}`}>
+                {t("totalDocuments")}
+              </p>
               <h2 className={`mt-1 text-3xl font-bold ${textClass}`}>
                 {documents.length}
               </h2>
@@ -273,7 +277,9 @@ function Documents() {
 
             <div className={`rounded-2xl border p-5 ${cardClass}`}>
               <FileText className="mb-3 text-blue-500" size={25} />
-              <p className={`text-sm ${mutedClass}`}>Categories</p>
+              <p className={`text-sm ${mutedClass}`}>
+                {t("categories")}
+              </p>
               <h2 className={`mt-1 text-3xl font-bold ${textClass}`}>
                 {new Set(documents.map((item) => item.category)).size}
               </h2>
@@ -281,7 +287,9 @@ function Documents() {
 
             <div className={`rounded-2xl border p-5 ${cardClass}`}>
               <Clock className="mb-3 text-amber-500" size={25} />
-              <p className={`text-sm ${mutedClass}`}>Expiring Soon</p>
+              <p className={`text-sm ${mutedClass}`}>
+                {t("expiringSoon")}
+              </p>
               <h2 className="mt-1 text-3xl font-bold text-amber-500">
                 {expiringSoonCount}
               </h2>
@@ -289,7 +297,9 @@ function Documents() {
 
             <div className={`rounded-2xl border p-5 ${cardClass}`}>
               <AlertTriangle className="mb-3 text-red-500" size={25} />
-              <p className={`text-sm ${mutedClass}`}>Expired Documents</p>
+              <p className={`text-sm ${mutedClass}`}>
+                {t("expiredDocuments")}
+              </p>
               <h2 className="mt-1 text-3xl font-bold text-red-500">
                 {expiredCount}
               </h2>
@@ -302,7 +312,7 @@ function Documents() {
               <div className="mb-3 flex items-center gap-2">
                 <AlertTriangle className="text-amber-500" size={21} />
                 <h2 className="font-semibold text-amber-500">
-                  Document Expiry Reminders
+                  {t("documentExpiryReminders")}
                 </h2>
               </div>
 
@@ -319,11 +329,7 @@ function Documents() {
                       <p key={item.id} className={`text-sm ${textClass}`}>
                         <strong>{item.name}</strong>
                         {" — "}
-                        {days < 0
-                          ? `Expired ${Math.abs(days)} days ago`
-                          : days === 0
-                          ? "Expires today"
-                          : `Expires in ${days} days`}
+                        {getExpiryMessage(days)}
                       </p>
                     );
                   })}
@@ -342,7 +348,7 @@ function Documents() {
                 type="text"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Search documents..."
+                placeholder={t("searchDocuments")}
                 className={`w-full rounded-xl border py-3 pl-12 pr-4 outline-none focus:border-teal-500 ${inputClass}`}
               />
             </div>
@@ -353,8 +359,8 @@ function Documents() {
               className={`rounded-xl border px-4 py-3 outline-none focus:border-teal-500 ${inputClass}`}
             >
               {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
+                <option key={category.value} value={category.value}>
+                  {t(category.key)}
                 </option>
               ))}
             </select>
@@ -364,10 +370,10 @@ function Documents() {
           <div className={`rounded-2xl border p-5 ${cardClass}`}>
             <div className="mb-5">
               <h2 className={`text-xl font-semibold ${textClass}`}>
-                Your Documents
+                {t("yourDocuments")}
               </h2>
               <p className={`mt-1 text-sm ${mutedClass}`}>
-                Upload and manage your travel-related files.
+                {t("manageTravelFiles")}
               </p>
             </div>
 
@@ -382,10 +388,10 @@ function Documents() {
                   size={42}
                 />
                 <h3 className={`text-lg font-semibold ${textClass}`}>
-                  No documents found
+                  {t("noDocumentsFound")}
                 </h3>
                 <p className={`mt-2 text-sm ${mutedClass}`}>
-                  Upload your passport, visa, tickets or other travel documents.
+                  {t("uploadTravelDocuments")}
                 </p>
               </div>
             ) : (
@@ -393,6 +399,10 @@ function Documents() {
                 {filteredDocuments.map((item) => {
                   const status = getExpiryStatus(item.expiryDate);
                   const days = getDaysRemaining(item.expiryDate);
+
+                  const categoryKey = categories.find(
+                    (category) => category.value === item.category
+                  )?.key;
 
                   return (
                     <div
@@ -413,32 +423,31 @@ function Documents() {
                             {item.name}
                           </h3>
                           <p className={`mt-1 text-sm ${mutedClass}`}>
-                            {item.category} · {item.size} MB
+                            {t(categoryKey || "other")} · {item.size} MB
                           </p>
                           <p className={`mt-1 text-xs ${mutedClass}`}>
-                            Uploaded: {item.uploadedAt}
+                            {t("uploaded")}: {item.uploadedAt}
                           </p>
                           <p className={`mt-1 flex items-center gap-1 text-xs ${mutedClass}`}>
                             <CalendarDays size={13} />
                             {item.expiryDate
-                              ? `Expiry: ${item.expiryDate}`
-                              : "Expiry date not provided"}
+                              ? `${t("expiry")}: ${item.expiryDate}`
+                              : t("expiryDateNotProvided")}
                           </p>
+
                           {item.expiryDate && (
-                            <p className={`mt-2 text-xs font-medium ${
-                              status.color === "red"
-                                ? "text-red-500"
-                                : status.color === "amber"
-                                ? "text-amber-500"
-                                : "text-green-500"
-                            }`}>
-                              {days < 0
-                                ? `Expired ${Math.abs(days)} days ago`
-                                : days === 0
-                                ? "Expires today"
-                                : days <= 30
-                                ? `Expires in ${days} days`
-                                : "Document is valid"}
+                            <p
+                              className={`mt-2 text-xs font-medium ${
+                                status.color === "red"
+                                  ? "text-red-500"
+                                  : status.color === "amber"
+                                  ? "text-amber-500"
+                                  : "text-green-500"
+                              }`}
+                            >
+                              {days <= 30
+                                ? getExpiryMessage(days)
+                                : t("documentIsValid")}
                             </p>
                           )}
                         </div>
@@ -448,12 +457,13 @@ function Documents() {
                         <span
                           className={`rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(status.color)}`}
                         >
-                          {status.label}
+                          {t(status.label)}
                         </span>
 
                         <button
                           onClick={() => setPreviewDocument(item)}
-                          title="Preview"
+                          title={t("preview")}
+                          aria-label={t("preview")}
                           className={`rounded-lg p-2.5 ${mutedClass} ${
                             isDark ? "bg-slate-800" : "bg-slate-200"
                           }`}
@@ -463,7 +473,8 @@ function Documents() {
 
                         <button
                           onClick={() => handleDownload(item)}
-                          title="Download"
+                          title={t("download")}
+                          aria-label={t("download")}
                           className={`rounded-lg p-2.5 ${mutedClass} ${
                             isDark ? "bg-slate-800" : "bg-slate-200"
                           }`}
@@ -473,7 +484,8 @@ function Documents() {
 
                         <button
                           onClick={() => handleDelete(item.id)}
-                          title="Delete"
+                          title={t("delete")}
+                          aria-label={t("delete")}
                           className="rounded-lg bg-red-500/10 p-2.5 text-red-500"
                         >
                           <Trash2 size={18} />
@@ -496,14 +508,10 @@ function Documents() {
               <ShieldCheck className="shrink-0 text-teal-500" size={22} />
               <div>
                 <h3 className="font-semibold text-teal-600">
-                  Document Security
+                  {t("documentSecurity")}
                 </h3>
                 <p className={`mt-1 text-sm ${mutedClass}`}>
-                  This is currently a frontend demonstration. Uploaded files
-                  remain in the current browser session and are not yet stored
-                  in encrypted permanent storage. Expiry reminders are displayed
-                  inside this page only. Automatic notifications will be added
-                  during backend integration.
+                  {t("documentSecurityDescription")}
                 </p>
               </div>
             </div>
@@ -522,7 +530,8 @@ function Documents() {
               <button
                 onClick={() => setPreviewDocument(null)}
                 className="rounded-lg p-2 text-slate-300 hover:bg-slate-800"
-                aria-label="Close preview"
+                aria-label={t("closePreview")}
+                title={t("closePreview")}
               >
                 <X size={20} />
               </button>

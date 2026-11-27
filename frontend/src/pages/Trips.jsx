@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Plus,
   MapPin,
@@ -17,6 +18,7 @@ import Sidebar from "../components/Sidebar";
 
 function Trips() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -57,7 +59,6 @@ function Trips() {
     time: "",
   });
 
-  // Add a new trip to the displayed trip list.
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -68,7 +69,7 @@ function Trips() {
       date: newTrip.date,
       time: newTrip.time,
       status: "Upcoming",
-      distance: "Not calculated",
+      distance: t("notCalculated"),
     };
 
     setTrips((prev) => [trip, ...prev]);
@@ -90,20 +91,19 @@ function Trips() {
       />
 
       <main className="min-h-screen lg:ml-72">
-        {/* Page header */}
         <header className="flex h-20 items-center justify-between border-b border-white/10 bg-slate-950 px-5 sm:px-8">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
               className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 lg:hidden"
-              aria-label="Open sidebar"
+              aria-label={t("openSidebar")}
             >
               <Navigation size={22} />
             </button>
             <div>
-              <h1 className="text-xl font-bold">My Trips</h1>
+              <h1 className="text-xl font-bold">{t("myTrips")}</h1>
               <p className="text-xs text-slate-400">
-                Manage and monitor your journeys
+                {t("manageJourneys")}
               </p>
             </div>
           </div>
@@ -113,42 +113,40 @@ function Trips() {
             className="flex items-center gap-2 rounded-xl bg-teal-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-300"
           >
             <Plus size={18} />
-            <span className="hidden sm:inline">Plan New Trip</span>
-            <span className="sm:hidden">New Trip</span>
+            <span className="hidden sm:inline">{t("planNewTrip")}</span>
+            <span className="sm:hidden">{t("newTrip")}</span>
           </button>
         </header>
 
         <div className="space-y-7 p-5 sm:p-8">
-          {/* Welcome banner */}
           <section className="rounded-2xl border border-teal-400/20 bg-gradient-to-r from-teal-950/70 to-slate-900 p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-400/10 text-teal-400">
                 <Route size={30} />
               </div>
               <div>
-                <h2 className="text-xl font-bold">Your Journeys</h2>
+                <h2 className="text-xl font-bold">{t("yourJourneys")}</h2>
                 <p className="mt-1 text-sm text-slate-400">
-                  Plan your travel and keep your journeys organized.
+                  {t("planTravelDescription")}
                 </p>
               </div>
             </div>
           </section>
 
-          {/* Trip statistics */}
           <section className="grid gap-4 sm:grid-cols-3">
             {[
               {
-                label: "Total Trips",
+                label: t("totalTrips"),
                 value: trips.length,
                 color: "text-blue-400",
               },
               {
-                label: "Upcoming Trips",
+                label: t("upcomingTrips"),
                 value: trips.filter((trip) => trip.status === "Upcoming").length,
                 color: "text-teal-400",
               },
               {
-                label: "Completed Trips",
+                label: t("completedTrips"),
                 value: trips.filter((trip) => trip.status === "Completed").length,
                 color: "text-purple-400",
               },
@@ -165,7 +163,6 @@ function Trips() {
             ))}
           </section>
 
-          {/* Search and filters */}
           <section className="flex flex-col gap-4 sm:flex-row">
             <div className="relative flex-1">
               <Search
@@ -176,19 +173,20 @@ function Trips() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search destination or starting point..."
+                placeholder={t("searchTripsPlaceholder")}
                 className="w-full rounded-xl border border-white/10 bg-slate-900 py-3.5 pl-12 pr-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-teal-400"
               />
             </div>
             <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-slate-400">
               <Filter size={18} />
-              All Trips
+              {t("allTrips")}
             </div>
           </section>
 
-          {/* Trip list */}
           <section>
-            <h3 className="mb-5 text-lg font-bold">Your Travel History</h3>
+            <h3 className="mb-5 text-lg font-bold">
+              {t("travelHistory")}
+            </h3>
 
             <div className="space-y-4">
               {filteredTrips.length > 0 ? (
@@ -205,7 +203,7 @@ function Trips() {
                         <div>
                           <h4 className="font-bold">{trip.destination}</h4>
                           <p className="mt-1 text-sm text-slate-400">
-                            From: {trip.start}
+                            {t("from")}: {trip.start}
                           </p>
                           <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
                             <span className="flex items-center gap-1.5">
@@ -218,7 +216,9 @@ function Trips() {
                             </span>
                             <span className="flex items-center gap-1.5">
                               <Route size={14} />
-                              {trip.distance}
+                              {trip.distance === "Not calculated"
+                                ? t("notCalculated")
+                                : trip.distance}
                             </span>
                           </div>
                         </div>
@@ -232,14 +232,16 @@ function Trips() {
                               : "bg-teal-400/10 text-teal-400"
                           }`}
                         >
-                          {trip.status}
+                          {trip.status === "Completed"
+                            ? t("completed")
+                            : t("upcoming")}
                         </span>
 
                         <button
                           onClick={() => navigate("/safe-routes")}
                           className="flex items-center gap-2 text-sm font-semibold text-teal-400 hover:text-teal-300"
                         >
-                          View <ArrowRight size={16} />
+                          {t("view")} <ArrowRight size={16} />
                         </button>
                       </div>
                     </div>
@@ -248,9 +250,9 @@ function Trips() {
               ) : (
                 <div className="rounded-2xl border border-white/10 bg-slate-900 p-10 text-center">
                   <MapPin size={35} className="mx-auto mb-3 text-slate-500" />
-                  <p className="font-semibold">No trips found</p>
+                  <p className="font-semibold">{t("noTripsFound")}</p>
                   <p className="mt-2 text-sm text-slate-400">
-                    Try searching for another destination.
+                    {t("tryAnotherDestination")}
                   </p>
                 </div>
               )}
@@ -259,21 +261,20 @@ function Trips() {
         </div>
       </main>
 
-      {/* New trip form modal */}
       {showForm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-black/70 p-4">
           <div className="my-auto w-full max-w-lg rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold">Plan a New Trip</h3>
+                <h3 className="text-xl font-bold">{t("planNewTrip")}</h3>
                 <p className="mt-1 text-sm text-slate-400">
-                  Enter your journey details.
+                  {t("enterJourneyDetails")}
                 </p>
               </div>
               <button
                 onClick={() => setShowForm(false)}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"
-                aria-label="Close form"
+                aria-label={t("closeForm")}
               >
                 <X size={21} />
               </button>
@@ -281,28 +282,32 @@ function Trips() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm">Starting Location</label>
+                <label className="mb-2 block text-sm">
+                  {t("startingLocation")}
+                </label>
                 <input
                   type="text"
                   value={newTrip.start}
                   onChange={(e) =>
                     setNewTrip({ ...newTrip, start: e.target.value })
                   }
-                  placeholder="Enter starting location"
+                  placeholder={t("enterStartingLocation")}
                   required
                   className="w-full rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm outline-none focus:border-teal-400"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm">Destination</label>
+                <label className="mb-2 block text-sm">
+                  {t("destination")}
+                </label>
                 <input
                   type="text"
                   value={newTrip.destination}
                   onChange={(e) =>
                     setNewTrip({ ...newTrip, destination: e.target.value })
                   }
-                  placeholder="Enter destination"
+                  placeholder={t("enterDestination")}
                   required
                   className="w-full rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm outline-none focus:border-teal-400"
                 />
@@ -310,7 +315,9 @@ function Trips() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm">Travel Date</label>
+                  <label className="mb-2 block text-sm">
+                    {t("travelDate")}
+                  </label>
                   <input
                     type="date"
                     value={newTrip.date}
@@ -324,7 +331,9 @@ function Trips() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm">Travel Time</label>
+                  <label className="mb-2 block text-sm">
+                    {t("travelTime")}
+                  </label>
                   <input
                     type="time"
                     value={newTrip.time}
@@ -342,7 +351,7 @@ function Trips() {
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-400 py-3.5 font-bold text-slate-950 transition hover:bg-teal-300"
               >
                 <Plus size={19} />
-                Create Trip
+                {t("createTrip")}
               </button>
             </form>
           </div>

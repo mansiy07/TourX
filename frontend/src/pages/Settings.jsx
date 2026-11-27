@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Menu,
   Settings as SettingsIcon,
@@ -17,6 +18,7 @@ import Sidebar from "../components/Sidebar";
 import { useTheme } from "../context/ThemeContext";
 
 function Settings() {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
@@ -51,13 +53,16 @@ function Settings() {
     <div className="flex items-center justify-between gap-4 border-b border-white/10 py-5 last:border-0">
       <div>
         <p className="text-sm font-semibold">{title}</p>
-        <p className="mt-1 text-xs leading-5 text-slate-400">{description}</p>
+        <p className="mt-1 text-xs leading-5 text-slate-400">
+          {description}
+        </p>
       </div>
       <button
         type="button"
         onClick={onChange}
         role="switch"
         aria-checked={checked}
+        aria-label={title}
         className={`relative h-7 w-12 shrink-0 rounded-full transition ${
           checked ? "bg-teal-400" : "bg-slate-700"
         }`}
@@ -85,14 +90,14 @@ function Settings() {
             <button
               onClick={() => setSidebarOpen(true)}
               className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 lg:hidden"
-              aria-label="Open sidebar"
+              aria-label={t("openSidebar")}
             >
               <Menu size={22} />
             </button>
             <div>
-              <h1 className="text-xl font-bold">Settings</h1>
+              <h1 className="text-xl font-bold">{t("settings")}</h1>
               <p className="text-xs text-slate-400">
-                Manage your application preferences
+                {t("manageApplicationPreferences")}
               </p>
             </div>
           </div>
@@ -105,13 +110,13 @@ function Settings() {
           {/* Introduction */}
           <section>
             <p className="mb-2 text-sm font-semibold tracking-widest text-teal-400">
-              PREFERENCES
+              {t("preferences").toUpperCase()}
             </p>
             <h2 className="text-2xl font-bold sm:text-3xl">
-              Application Settings
+              {t("applicationSettings")}
             </h2>
             <p className="mt-2 text-sm text-slate-400">
-              Customize your Smart Tourist Safety experience.
+              {t("customizeExperience")}
             </p>
           </section>
 
@@ -120,9 +125,9 @@ function Settings() {
             <div className="mb-5 flex items-center gap-3">
               <Sun size={22} className="text-teal-400" />
               <div>
-                <h3 className="font-bold">Appearance</h3>
+                <h3 className="font-bold">{t("appearance")}</h3>
                 <p className="mt-1 text-xs text-slate-400">
-                  Choose your preferred application theme.
+                  {t("chooseTheme")}
                 </p>
               </div>
             </div>
@@ -132,6 +137,7 @@ function Settings() {
                 onClick={() => {
                   if (theme !== "light") toggleTheme();
                 }}
+                aria-pressed={theme === "light"}
                 className={`flex items-center gap-4 rounded-xl border p-5 text-left transition ${
                   theme === "light"
                     ? "border-teal-400 bg-teal-400/10"
@@ -140,9 +146,9 @@ function Settings() {
               >
                 <Sun size={25} className="text-orange-400" />
                 <div>
-                  <p className="font-semibold">Light Mode</p>
+                  <p className="font-semibold">{t("lightMode")}</p>
                   <p className="mt-1 text-xs text-slate-400">
-                    Bright and clean appearance
+                    {t("lightModeDescription")}
                   </p>
                 </div>
               </button>
@@ -151,6 +157,7 @@ function Settings() {
                 onClick={() => {
                   if (theme !== "dark") toggleTheme();
                 }}
+                aria-pressed={theme === "dark"}
                 className={`flex items-center gap-4 rounded-xl border p-5 text-left transition ${
                   theme === "dark"
                     ? "border-teal-400 bg-teal-400/10"
@@ -159,9 +166,9 @@ function Settings() {
               >
                 <Moon size={25} className="text-teal-400" />
                 <div>
-                  <p className="font-semibold">Dark Mode</p>
+                  <p className="font-semibold">{t("darkMode")}</p>
                   <p className="mt-1 text-xs text-slate-400">
-                    Comfortable low-light appearance
+                    {t("darkModeDescription")}
                   </p>
                 </div>
               </button>
@@ -173,37 +180,37 @@ function Settings() {
             <div className="mb-2 flex items-center gap-3">
               <Bell size={22} className="text-teal-400" />
               <div>
-                <h3 className="font-bold">Notifications</h3>
+                <h3 className="font-bold">{t("notifications")}</h3>
                 <p className="mt-1 text-xs text-slate-400">
-                  Control which notifications you want to receive.
+                  {t("notificationPreferencesDescription")}
                 </p>
               </div>
             </div>
 
             <PreferenceToggle
-              title="Email Notifications"
-              description="Receive updates and information through email."
+              title={t("emailNotifications")}
+              description={t("emailNotificationsDescription")}
               checked={preferences.emailNotifications}
               onChange={() => handleToggle("emailNotifications")}
             />
 
             <PreferenceToggle
-              title="Push Notifications"
-              description="Receive application notifications on your device."
+              title={t("pushNotifications")}
+              description={t("pushNotificationsDescription")}
               checked={preferences.pushNotifications}
               onChange={() => handleToggle("pushNotifications")}
             />
 
             <PreferenceToggle
-              title="Emergency Alerts"
-              description="Enable emergency-related notification preferences."
+              title={t("emergencyAlerts")}
+              description={t("emergencyAlertsDescription")}
               checked={preferences.emergencyAlerts}
               onChange={() => handleToggle("emergencyAlerts")}
             />
 
             <PreferenceToggle
-              title="Trip Updates"
-              description="Receive updates about your planned trips."
+              title={t("tripUpdates")}
+              description={t("tripUpdatesDescription")}
               checked={preferences.tripUpdates}
               onChange={() => handleToggle("tripUpdates")}
             />
@@ -214,23 +221,23 @@ function Settings() {
             <div className="mb-2 flex items-center gap-3">
               <Shield size={22} className="text-teal-400" />
               <div>
-                <h3 className="font-bold">Privacy & Location</h3>
+                <h3 className="font-bold">{t("privacyLocation")}</h3>
                 <p className="mt-1 text-xs text-slate-400">
-                  Manage your privacy preferences.
+                  {t("privacyPreferencesDescription")}
                 </p>
               </div>
             </div>
 
             <PreferenceToggle
-              title="Location Sharing"
-              description="Allow location sharing when the location feature is connected."
+              title={t("locationSharing")}
+              description={t("locationSharingDescription")}
               checked={preferences.locationSharing}
               onChange={() => handleToggle("locationSharing")}
             />
 
             <PreferenceToggle
-              title="Profile Visibility"
-              description="Control whether your profile can be visible to other users."
+              title={t("profileVisibility")}
+              description={t("profileVisibilityDescription")}
               checked={preferences.profileVisibility}
               onChange={() => handleToggle("profileVisibility")}
             />
@@ -241,9 +248,9 @@ function Settings() {
             <div className="mb-5 flex items-center gap-3">
               <Lock size={22} className="text-teal-400" />
               <div>
-                <h3 className="font-bold">Security</h3>
+                <h3 className="font-bold">{t("security")}</h3>
                 <p className="mt-1 text-xs text-slate-400">
-                  Account security features.
+                  {t("accountSecurityFeatures")}
                 </p>
               </div>
             </div>
@@ -252,9 +259,11 @@ function Settings() {
               <div className="flex items-center gap-3 rounded-xl bg-slate-950 p-4">
                 <Mail size={20} className="text-teal-400" />
                 <div>
-                  <p className="text-sm font-semibold">Email Verification</p>
+                  <p className="text-sm font-semibold">
+                    {t("emailVerification")}
+                  </p>
                   <p className="mt-1 text-xs text-slate-500">
-                    Will be available after backend integration.
+                    {t("availableAfterBackendIntegration")}
                   </p>
                 </div>
               </div>
@@ -262,9 +271,11 @@ function Settings() {
               <div className="flex items-center gap-3 rounded-xl bg-slate-950 p-4">
                 <Smartphone size={20} className="text-teal-400" />
                 <div>
-                  <p className="text-sm font-semibold">Two-Factor Authentication</p>
+                  <p className="text-sm font-semibold">
+                    {t("twoFactorAuthentication")}
+                  </p>
                   <p className="mt-1 text-xs text-slate-500">
-                    Security integration pending.
+                    {t("securityIntegrationPending")}
                   </p>
                 </div>
               </div>
@@ -272,9 +283,11 @@ function Settings() {
               <div className="flex items-center gap-3 rounded-xl bg-slate-950 p-4">
                 <MapPin size={20} className="text-teal-400" />
                 <div>
-                  <p className="text-sm font-semibold">Location Permissions</p>
+                  <p className="text-sm font-semibold">
+                    {t("locationPermissions")}
+                  </p>
                   <p className="mt-1 text-xs text-slate-500">
-                    GPS permission management will be added later.
+                    {t("gpsPermissionManagementPending")}
                   </p>
                 </div>
               </div>
@@ -284,13 +297,13 @@ function Settings() {
           {/* Save preferences */}
           <section className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-teal-400/20 bg-teal-400/5 p-6 sm:flex-row sm:items-center">
             <div>
-              <h3 className="font-bold">Save Your Preferences</h3>
+              <h3 className="font-bold">{t("saveYourPreferences")}</h3>
               <p className="mt-1 text-xs text-slate-400">
-                Save notification and privacy preferences on this device.
+                {t("savePreferencesDescription")}
               </p>
               {saved && (
                 <p className="mt-2 text-sm text-teal-400">
-                  Preferences saved successfully.
+                  {t("preferencesSaved")}
                 </p>
               )}
             </div>
@@ -299,13 +312,12 @@ function Settings() {
               className="flex items-center gap-2 rounded-xl bg-teal-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-teal-300"
             >
               <Save size={17} />
-              Save Settings
+              {t("saveSettings")}
             </button>
           </section>
 
           <p className="border-t border-white/10 py-5 text-center text-xs text-slate-500">
-            Some settings are frontend demonstrations and will become fully
-            functional after backend integration.
+            {t("settingsFooterDisclaimer")}
           </p>
         </div>
       </main>

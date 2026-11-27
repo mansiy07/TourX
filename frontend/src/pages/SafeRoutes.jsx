@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Menu,
   MapPin,
@@ -11,6 +11,7 @@ import {
   Route,
   AlertTriangle,
   ArrowRight,
+  LocateFixed,
 } from "lucide-react";
 import {
   MapContainer,
@@ -18,6 +19,7 @@ import {
   Marker,
   Popup,
   Polyline,
+  useMap,
 } from "react-leaflet";
 import L from "leaflet";
 import Sidebar from "../components/Sidebar";
@@ -34,13 +36,29 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
 
+// Update the map view when the user's location changes.
+function MapUpdater({ position }) {
+  const map = useMap();
+
+  if (position) {
+    map.setView(position, 13);
+  }
+
+  return null;
+}
+
 function SafeRoutes() {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [start, setStart] = useState("Prayagraj");
   const [destination, setDestination] = useState("Varanasi");
   const [showRoute, setShowRoute] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState("");
+  const [locationMessage, setLocationMessage] = useState("");
+  const [locationAccuracy, setLocationAccuracy] = useState(null);
 
-  // Demo coordinates for the map.
   const startPosition = [25.4358, 81.8463];
   const destinationPosition = [25.3176, 82.9739];
 
@@ -52,13 +70,73 @@ function SafeRoutes() {
     destinationPosition,
   ];
 
+  const getCurrentLocation = () => {
+    setLocationError("");
+    setLocationMessage("");
+    setLocationAccuracy(null);
+
+    if (!navigator.geolocation) {
+      setLocationError(t("geolocationNotSupported"));
+      return;
+    }
+
+    setLocationLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coordinates = [
+          position.coords.latitude,
+          position.coords.longitude,
+        ];
+
+        setUserLocation(coordinates);
+        setStart(t("myCurrentLocation"));
+        setShowRoute(false);
+        setLocationLoading(false);
+
+        const accuracy = Math.round(position.coords.accuracy);
+        setLocationAccuracy(accuracy);
+        setLocationMessage(t("locationDetected"));
+      },
+      (error) => {
+        setLocationLoading(false);
+
+        if (error.code === error.PERMISSION_DENIED) {
+          setLocationError(t("locationPermissionDenied"));
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          setLocationError(t("locationUnavailable"));
+        } else if (error.code === error.TIMEOUT) {
+          setLocationError(t("locationTimeout"));
+        } else {
+          setLocationError(t("locationDetectionFailed"));
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+      }
+    );
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
 
-    if (start.trim() && destination.trim()) {
-      setShowRoute(true);
+    if (!start.trim() || !destination.trim()) {
+      return;
     }
+
+    if (userLocation) {
+      setShowRoute(false);
+      setLocationMessage(t("actualRoutingPending"));
+      return;
+    }
+
+    setShowRoute(true);
   };
+
+  const mapCenter = userLocation || [25.38, 82.4];
+  const markerPosition = userLocation || startPosition;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -68,39 +146,41 @@ function SafeRoutes() {
       />
 
       <main className="min-h-screen lg:ml-72">
-        {/* Page header */}
         <header className="flex h-20 items-center gap-4 border-b border-white/10 bg-slate-950 px-5 sm:px-8">
           <button
             onClick={() => setSidebarOpen(true)}
             className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 lg:hidden"
-            aria-label="Open sidebar"
+            aria-label={t("openSidebar")}
           >
             <Menu size={22} />
           </button>
 
           <div>
-            <h1 className="text-xl font-bold">Safe Routes</h1>
+            <h1 className="text-xl font-bold">{t("safeRoutes")}</h1>
             <p className="text-xs text-slate-400">
-              Explore your journey with safety insights
+              {t("safeRoutesSubtitle")}
             </p>
           </div>
         </header>
 
         <div className="space-y-7 p-5 sm:p-8">
-          {/* Introduction */}
           <section>
-            <h2 className="text-2xl font-bold">Find Your Safe Route</h2>
+            <h2 className="text-2xl font-bold">
+              {t("findYourSafeRoute")}
+            </h2>
             <p className="mt-2 text-sm text-slate-400">
-              Plan your journey and explore location-based safety information.
+              {t("safeRouteDescription")}
             </p>
           </section>
 
-          {/* Route search form */}
           <section className="rounded-2xl border border-white/10 bg-slate-900 p-5 sm:p-6">
-            <form onSubmit={handleSearch} className="grid gap-4 md:grid-cols-[1fr_1fr_auto]">
+            <form
+              onSubmit={handleSearch}
+              className="grid gap-4 md:grid-cols-[1fr_1fr_auto]"
+            >
               <div>
                 <label className="mb-2 block text-sm font-medium">
-                  Starting Location
+                  {t("startingLocation")}
                 </label>
                 <div className="relative">
                   <MapPin
@@ -109,17 +189,51 @@ function SafeRoutes() {
                   />
                   <input
                     value={start}
-                    onChange={(e) => setStart(e.target.value)}
-                    placeholder="Enter starting location"
+                    onChange={(e) => {
+                      setStart(e.target.value);
+                      setUserLocation(null);
+                      setLocationMessage("");
+                      setLocationAccuracy(null);
+                    }}
+                    placeholder={t("enterStartingLocation")}
                     required
                     className="w-full rounded-xl border border-white/10 bg-slate-950 py-3.5 pl-12 pr-4 text-sm outline-none focus:border-teal-400"
                   />
                 </div>
+
+                <button
+                  type="button"
+                  onClick={getCurrentLocation}
+                  disabled={locationLoading}
+                  className="mt-3 flex items-center gap-2 text-sm font-semibold text-teal-400 hover:text-teal-300 disabled:opacity-50"
+                >
+                  <LocateFixed size={17} />
+                  {locationLoading
+                    ? t("detectingLocation")
+                    : t("useCurrentLocation")}
+                </button>
+
+                {locationError && (
+                  <p className="mt-2 text-xs text-red-400">
+                    {locationError}
+                  </p>
+                )}
+
+                {locationMessage && (
+                  <div className="mt-2 text-xs text-teal-400">
+                    <p>{locationMessage}</p>
+                    {locationAccuracy !== null && (
+                      <p className="mt-1">
+                        {t("locationAccuracy")}: {locationAccuracy} {t("metres")}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium">
-                  Destination
+                  {t("destination")}
                 </label>
                 <div className="relative">
                   <Navigation
@@ -129,7 +243,7 @@ function SafeRoutes() {
                   <input
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
-                    placeholder="Enter destination"
+                    placeholder={t("enterDestination")}
                     required
                     className="w-full rounded-xl border border-white/10 bg-slate-950 py-3.5 pl-12 pr-4 text-sm outline-none focus:border-teal-400"
                   />
@@ -142,20 +256,21 @@ function SafeRoutes() {
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-400 px-6 py-3.5 font-bold text-slate-950 transition hover:bg-teal-300 md:w-auto"
                 >
                   <Search size={19} />
-                  Find Route
+                  {t("findRoute")}
                 </button>
               </div>
             </form>
           </section>
 
-          {/* Map and route information */}
           <section className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-slate-900">
               <div className="flex items-center justify-between border-b border-white/10 p-5">
                 <div>
-                  <h3 className="font-bold">Live Map View</h3>
+                  <h3 className="font-bold">{t("liveMapView")}</h3>
                   <p className="mt-1 text-xs text-slate-400">
-                    Demo route: Prayagraj to Varanasi
+                    {userLocation
+                      ? t("detectedCurrentLocation")
+                      : t("demoRouteDescription")}
                   </p>
                 </div>
                 <MapPin size={21} className="text-teal-400" />
@@ -163,25 +278,33 @@ function SafeRoutes() {
 
               <div className="h-[420px] w-full">
                 <MapContainer
-                  center={[25.38, 82.4]}
-                  zoom={8}
+                  center={mapCenter}
+                  zoom={userLocation ? 13 : 8}
                   scrollWheelZoom={true}
                   className="h-full w-full"
                 >
+                  <MapUpdater position={userLocation} />
+
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
 
-                  <Marker position={startPosition}>
-                    <Popup>Starting Point: Prayagraj</Popup>
+                  <Marker position={markerPosition}>
+                    <Popup>
+                      {userLocation
+                        ? t("yourCurrentLocation")
+                        : t("startingPointPrayagraj")}
+                    </Popup>
                   </Marker>
 
-                  <Marker position={destinationPosition}>
-                    <Popup>Destination: Varanasi</Popup>
-                  </Marker>
+                  {!userLocation && (
+                    <Marker position={destinationPosition}>
+                      <Popup>{t("destinationVaranasi")}</Popup>
+                    </Marker>
+                  )}
 
-                  {showRoute && (
+                  {showRoute && !userLocation && (
                     <Polyline
                       positions={routePositions}
                       pathOptions={{
@@ -194,11 +317,10 @@ function SafeRoutes() {
               </div>
             </div>
 
-            {/* Route details */}
             <div className="space-y-5">
               <div className="rounded-2xl border border-white/10 bg-slate-900 p-6">
                 <div className="mb-5 flex items-center justify-between">
-                  <h3 className="font-bold">Route Information</h3>
+                  <h3 className="font-bold">{t("routeInformation")}</h3>
                   <Route size={21} className="text-teal-400" />
                 </div>
 
@@ -206,7 +328,9 @@ function SafeRoutes() {
                   <div className="flex gap-3">
                     <MapPin size={20} className="text-teal-400" />
                     <div>
-                      <p className="text-xs text-slate-500">STARTING POINT</p>
+                      <p className="text-xs text-slate-500">
+                        {t("startingPoint").toUpperCase()}
+                      </p>
                       <p className="mt-1 font-semibold">{start}</p>
                     </div>
                   </div>
@@ -216,47 +340,61 @@ function SafeRoutes() {
                   <div className="flex gap-3">
                     <Navigation size={20} className="text-orange-400" />
                     <div>
-                      <p className="text-xs text-slate-500">DESTINATION</p>
+                      <p className="text-xs text-slate-500">
+                        {t("destination").toUpperCase()}
+                      </p>
                       <p className="mt-1 font-semibold">{destination}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-7 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-slate-800 p-4">
-                    <Clock size={19} className="text-teal-400" />
-                    <p className="mt-3 text-xs text-slate-400">Estimated Time</p>
-                    <p className="mt-1 font-bold">3 hr 30 min</p>
-                  </div>
+                {!userLocation && (
+                  <div className="mt-7 grid grid-cols-2 gap-3">
+                    <div className="rounded-xl bg-slate-800 p-4">
+                      <Clock size={19} className="text-teal-400" />
+                      <p className="mt-3 text-xs text-slate-400">
+                        {t("demoEstimatedTime")}
+                      </p>
+                      <p className="mt-1 font-bold">3 hr 30 min</p>
+                    </div>
 
-                  <div className="rounded-xl bg-slate-800 p-4">
-                    <Route size={19} className="text-teal-400" />
-                    <p className="mt-3 text-xs text-slate-400">Distance</p>
-                    <p className="mt-1 font-bold">120 km</p>
+                    <div className="rounded-xl bg-slate-800 p-4">
+                      <Route size={19} className="text-teal-400" />
+                      <p className="mt-3 text-xs text-slate-400">
+                        {t("demoDistance")}
+                      </p>
+                      <p className="mt-1 font-bold">120 km</p>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <button
-                  onClick={() => setShowRoute(true)}
+                  onClick={() => {
+                    setUserLocation(null);
+                    setStart("Prayagraj");
+                    setDestination("Varanasi");
+                    setShowRoute(true);
+                    setLocationMessage("");
+                    setLocationError("");
+                    setLocationAccuracy(null);
+                  }}
                   className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-teal-400 py-3 font-bold text-slate-950 transition hover:bg-teal-300"
                 >
-                  Show Demo Route <ArrowRight size={18} />
+                  {t("showDemoRoute")} <ArrowRight size={18} />
                 </button>
               </div>
 
-              {/* Safety information */}
               <div className="rounded-2xl border border-teal-400/20 bg-teal-400/5 p-5">
                 <div className="flex items-center gap-3">
                   <ShieldCheck size={24} className="text-teal-400" />
-                  <h3 className="font-bold">Safety Insights</h3>
+                  <h3 className="font-bold">{t("safetyInsights")}</h3>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-slate-400">
-                  Route safety analysis will be available after integrating
-                  the AI risk prediction service and location-based data.
+                  {t("routeSafetyPending")}
                 </p>
                 <div className="mt-4 flex items-center gap-2 text-xs text-orange-400">
                   <AlertTriangle size={16} />
-                  Safety score is not available yet.
+                  {t("safetyScoreUnavailable")}
                 </div>
               </div>
             </div>

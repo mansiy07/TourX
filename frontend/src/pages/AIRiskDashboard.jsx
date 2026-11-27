@@ -1,12 +1,12 @@
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Menu,
   BrainCircuit,
   ShieldCheck,
   AlertTriangle,
   Activity,
-  MapPin,
   Clock,
   TrendingUp,
   TrendingDown,
@@ -18,36 +18,37 @@ import {
 import Sidebar from "../components/Sidebar";
 
 function AIRiskDashboard() {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("24 Hours");
 
   // Demo risk indicators for the dashboard.
   const riskFactors = [
     {
-      name: "Location Risk",
-      description: "Based on the selected demo location",
-      level: "Medium",
+      key: "locationRisk",
+      description: "locationRiskDescription",
+      level: "medium",
       percentage: 65,
       color: "bg-orange-400",
     },
     {
-      name: "Route Deviation",
-      description: "Unexpected movement from the planned route",
-      level: "Low",
+      key: "routeDeviation",
+      description: "routeDeviationDescription",
+      level: "low",
       percentage: 25,
       color: "bg-teal-400",
     },
     {
-      name: "Environmental Risk",
-      description: "Weather and surrounding conditions",
-      level: "Medium",
+      key: "environmentalRisk",
+      description: "environmentalRiskDescription",
+      level: "medium",
       percentage: 55,
       color: "bg-orange-400",
     },
     {
-      name: "Activity Anomaly",
-      description: "Unusual activity pattern detection",
-      level: "Low",
+      key: "activityAnomaly",
+      description: "activityAnomalyDescription",
+      level: "low",
       percentage: 18,
       color: "bg-teal-400",
     },
@@ -57,30 +58,30 @@ function AIRiskDashboard() {
   const alerts = [
     {
       id: 1,
-      title: "Moderate Location Risk",
-      message: "A selected demo area has a moderate risk indicator.",
-      time: "10 minutes ago",
+      title: "moderateLocationRisk",
+      message: "moderateLocationRiskMessage",
+      time: "tenMinutesAgo",
       type: "warning",
     },
     {
       id: 2,
-      title: "Route Monitoring Active",
-      message: "The demo route monitoring interface is active.",
-      time: "35 minutes ago",
+      title: "routeMonitoringActive",
+      message: "routeMonitoringActiveMessage",
+      time: "thirtyFiveMinutesAgo",
       type: "info",
     },
     {
       id: 3,
-      title: "No Anomaly Detected",
-      message: "No anomaly is recorded in the sample data.",
-      time: "1 hour ago",
+      title: "noAnomalyDetected",
+      message: "noAnomalyDetectedMessage",
+      time: "oneHourAgo",
       type: "success",
     },
   ];
 
   const riskColor = (level) => {
-    if (level === "High") return "text-red-400 bg-red-400/10";
-    if (level === "Medium") return "text-orange-400 bg-orange-400/10";
+    if (level === "high") return "text-red-400 bg-red-400/10";
+    if (level === "medium") return "text-orange-400 bg-orange-400/10";
     return "text-teal-400 bg-teal-400/10";
   };
 
@@ -98,21 +99,21 @@ function AIRiskDashboard() {
             <button
               onClick={() => setSidebarOpen(true)}
               className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 lg:hidden"
-              aria-label="Open sidebar"
+              aria-label={t("openSidebar")}
             >
               <Menu size={22} />
             </button>
             <div>
-              <h1 className="text-xl font-bold">AI Risk Dashboard</h1>
+              <h1 className="text-xl font-bold">{t("aiRiskDashboard")}</h1>
               <p className="text-xs text-slate-400">
-                Tourist safety intelligence and risk monitoring
+                {t("aiRiskDashboardSubtitle")}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 rounded-full border border-teal-400/20 bg-teal-400/10 px-3 py-2 text-xs text-teal-400">
             <BrainCircuit size={15} />
-            AI Demo
+            {t("aiDemo")}
           </div>
         </header>
 
@@ -121,14 +122,13 @@ function AIRiskDashboard() {
           <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="mb-2 text-sm font-semibold tracking-widest text-teal-400">
-                INTELLIGENT SAFETY MONITORING
+                {t("intelligentSafetyMonitoring")}
               </p>
               <h2 className="text-2xl font-bold sm:text-3xl">
-                AI Safety Overview
+                {t("aiSafetyOverview")}
               </h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
-                Monitor safety indicators, review risk signals, and understand
-                potential travel anomalies.
+                {t("aiSafetyOverviewDescription")}
               </p>
             </div>
 
@@ -137,7 +137,7 @@ function AIRiskDashboard() {
               className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-slate-300 transition hover:border-teal-400/40"
             >
               <RefreshCw size={16} />
-              Reset View
+              {t("resetView")}
             </button>
           </section>
 
@@ -146,28 +146,29 @@ function AIRiskDashboard() {
             <div className="rounded-2xl border border-orange-400/20 bg-gradient-to-br from-orange-950/40 to-slate-900 p-6 xl:col-span-1">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-slate-300">
-                  Overall Demo Risk
+                  {t("overallDemoRisk")}
                 </p>
                 <AlertTriangle size={21} className="text-orange-400" />
               </div>
 
               <div className="mt-7 flex items-center justify-center">
                 <div className="relative flex h-40 w-40 items-center justify-center rounded-full border-[12px] border-orange-400/20">
-                  <div className="absolute inset-0 rounded-full border-[12px] border-transparent border-t-orange-400 border-r-orange-400 rotate-45"></div>
+                  <div className="absolute inset-0 rotate-45 rounded-full border-[12px] border-transparent border-r-orange-400 border-t-orange-400"></div>
                   <div className="text-center">
                     <p className="text-4xl font-black">52</p>
-                    <p className="mt-1 text-xs text-slate-400">Out of 100</p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {t("outOf100")}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-6 text-center">
                 <span className="rounded-full bg-orange-400/10 px-4 py-2 text-sm font-bold text-orange-400">
-                  Moderate Risk
+                  {t("moderateRisk")}
                 </span>
                 <p className="mt-4 text-xs leading-5 text-slate-400">
-                  Illustrative demo score. This is not a real AI prediction
-                  or verified assessment of your current safety.
+                  {t("illustrativeRiskDisclaimer")}
                 </p>
               </div>
             </div>
@@ -178,15 +179,17 @@ function AIRiskDashboard() {
                   <div className="rounded-xl bg-teal-400/10 p-3 text-teal-400">
                     <ShieldCheck size={23} />
                   </div>
-                  <span className="text-xs text-slate-500">Demo data</span>
+                  <span className="text-xs text-slate-500">
+                    {t("demoData")}
+                  </span>
                 </div>
                 <h3 className="mt-5 text-3xl font-bold">02</h3>
                 <p className="mt-1 text-sm text-slate-400">
-                  Active Safety Indicators
+                  {t("activeSafetyIndicators")}
                 </p>
                 <p className="mt-4 flex items-center gap-2 text-xs text-teal-400">
                   <Activity size={15} />
-                  Sample monitoring data
+                  {t("sampleMonitoringData")}
                 </p>
               </div>
 
@@ -195,15 +198,17 @@ function AIRiskDashboard() {
                   <div className="rounded-xl bg-red-400/10 p-3 text-red-400">
                     <AlertTriangle size={23} />
                   </div>
-                  <span className="text-xs text-slate-500">Demo data</span>
+                  <span className="text-xs text-slate-500">
+                    {t("demoData")}
+                  </span>
                 </div>
                 <h3 className="mt-5 text-3xl font-bold">01</h3>
                 <p className="mt-1 text-sm text-slate-400">
-                  Warning Indicators
+                  {t("warningIndicators")}
                 </p>
                 <p className="mt-4 flex items-center gap-2 text-xs text-orange-400">
                   <TrendingUp size={15} />
-                  Illustrative warning count
+                  {t("illustrativeWarningCount")}
                 </p>
               </div>
 
@@ -212,14 +217,18 @@ function AIRiskDashboard() {
                   <div className="rounded-xl bg-blue-400/10 p-3 text-blue-400">
                     <Radio size={23} />
                   </div>
-                  <span className="text-xs text-slate-500">Demo data</span>
+                  <span className="text-xs text-slate-500">
+                    {t("demoData")}
+                  </span>
                 </div>
-                <h3 className="mt-5 text-3xl font-bold">Active</h3>
+                <h3 className="mt-5 text-3xl font-bold">
+                  {t("active")}
+                </h3>
                 <p className="mt-1 text-sm text-slate-400">
-                  Monitoring Interface
+                  {t("monitoringInterface")}
                 </p>
                 <p className="mt-4 text-xs text-slate-500">
-                  Live sensor connection pending
+                  {t("liveSensorConnectionPending")}
                 </p>
               </div>
 
@@ -228,15 +237,17 @@ function AIRiskDashboard() {
                   <div className="rounded-xl bg-purple-400/10 p-3 text-purple-400">
                     <Eye size={23} />
                   </div>
-                  <span className="text-xs text-slate-500">Demo data</span>
+                  <span className="text-xs text-slate-500">
+                    {t("demoData")}
+                  </span>
                 </div>
                 <h3 className="mt-5 text-3xl font-bold">00</h3>
                 <p className="mt-1 text-sm text-slate-400">
-                  Sample Anomaly Events
+                  {t("sampleAnomalyEvents")}
                 </p>
                 <p className="mt-4 flex items-center gap-2 text-xs text-teal-400">
                   <TrendingDown size={15} />
-                  No sample anomaly recorded
+                  {t("noSampleAnomalyRecorded")}
                 </p>
               </div>
             </div>
@@ -246,9 +257,11 @@ function AIRiskDashboard() {
           <section className="rounded-2xl border border-white/10 bg-slate-900 p-6">
             <div className="mb-7 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
               <div>
-                <h3 className="text-lg font-bold">Risk Factor Analysis</h3>
+                <h3 className="text-lg font-bold">
+                  {t("riskFactorAnalysis")}
+                </h3>
                 <p className="mt-1 text-xs text-slate-400">
-                  Illustrative values for different safety indicators.
+                  {t("riskFactorAnalysisDescription")}
                 </p>
               </div>
 
@@ -257,20 +270,22 @@ function AIRiskDashboard() {
                 onChange={(e) => setSelectedPeriod(e.target.value)}
                 className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-slate-300 outline-none focus:border-teal-400"
               >
-                <option>24 Hours</option>
-                <option>7 Days</option>
-                <option>30 Days</option>
+                <option value="24 Hours">{t("last24Hours")}</option>
+                <option value="7 Days">{t("last7Days")}</option>
+                <option value="30 Days">{t("last30Days")}</option>
               </select>
             </div>
 
             <div className="space-y-7">
               {riskFactors.map((factor) => (
-                <div key={factor.name}>
+                <div key={factor.key}>
                   <div className="mb-3 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
                     <div>
-                      <p className="text-sm font-semibold">{factor.name}</p>
+                      <p className="text-sm font-semibold">
+                        {t(factor.key)}
+                      </p>
                       <p className="mt-1 text-xs text-slate-500">
-                        {factor.description}
+                        {t(factor.description)}
                       </p>
                     </div>
 
@@ -279,11 +294,9 @@ function AIRiskDashboard() {
                         {factor.percentage}%
                       </span>
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${riskColor(
-                          factor.level
-                        )}`}
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${riskColor(factor.level)}`}
                       >
-                        {factor.level}
+                        {t(factor.level)}
                       </span>
                     </div>
                   </div>
@@ -303,9 +316,11 @@ function AIRiskDashboard() {
           <section className="rounded-2xl border border-white/10 bg-slate-900 p-6">
             <div className="mb-6 flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-lg font-bold">Recent Safety Alerts</h3>
+                <h3 className="text-lg font-bold">
+                  {t("recentSafetyAlerts")}
+                </h3>
                 <p className="mt-1 text-xs text-slate-400">
-                  Example events generated for the demo interface.
+                  {t("recentSafetyAlertsDescription")}
                 </p>
               </div>
               <Clock size={21} className="text-teal-400" />
@@ -336,12 +351,14 @@ function AIRiskDashboard() {
                   </div>
 
                   <div className="flex-1">
-                    <p className="text-sm font-semibold">{alert.title}</p>
+                    <p className="text-sm font-semibold">
+                      {t(alert.title)}
+                    </p>
                     <p className="mt-1 text-xs leading-5 text-slate-400">
-                      {alert.message}
+                      {t(alert.message)}
                     </p>
                     <p className="mt-2 text-xs text-slate-500">
-                      {alert.time}
+                      {t(alert.time)}
                     </p>
                   </div>
 
@@ -361,24 +378,21 @@ function AIRiskDashboard() {
                 <BrainCircuit size={24} />
               </div>
               <div>
-                <h3 className="font-bold">AI Monitoring Information</h3>
+                <h3 className="font-bold">
+                  {t("aiMonitoringInformation")}
+                </h3>
                 <p className="mt-2 text-sm leading-6 text-slate-400">
-                  The planned AI service will analyze location risk,
-                  route deviations, unusual activity patterns, and
-                  emergency message classifications. Risk scores will
-                  provide advisory information and will not confirm an
-                  emergency.
+                  {t("aiMonitoringInformationDescription")}
                 </p>
                 <p className="mt-3 text-xs font-semibold text-teal-400">
-                  AI service integration: Pending
+                  {t("aiServiceIntegrationPending")}
                 </p>
               </div>
             </div>
           </section>
 
           <p className="border-t border-white/10 py-5 text-center text-xs text-slate-500">
-            Frontend demonstration only. No real-time AI model or location
-            monitoring is connected.
+            {t("aiDashboardFooterDisclaimer")}
           </p>
         </div>
       </main>

@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Menu,
   ShieldAlert,
@@ -14,6 +15,9 @@ import {
   Trash2,
   X,
   Users,
+  Navigation,
+  RefreshCw,
+  LocateFixed,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 
@@ -27,40 +31,86 @@ const initialContacts = [
 ];
 
 function Emergency() {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sosActive, setSosActive] = useState(false);
   const [contacts, setContacts] = useState(() => {
     try {
-      const savedContacts = localStorage.getItem("emergencyContacts");
-      return savedContacts ? JSON.parse(savedContacts) : initialContacts;
+      const saved = localStorage.getItem("emergencyContacts");
+      return saved ? JSON.parse(saved) : initialContacts;
     } catch {
       return initialContacts;
     }
   });
+
   const [newContact, setNewContact] = useState({
     name: "",
     phone: "",
     relationship: "Family",
   });
+
   const [showContactForm, setShowContactForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  // Save emergency contacts whenever the list changes.
+  const [location, setLocation] = useState(null);
+  const [locationStatus, setLocationStatus] = useState("not-requested");
+  const [locationError, setLocationError] = useState("");
+
   useEffect(() => {
     localStorage.setItem("emergencyContacts", JSON.stringify(contacts));
   }, [contacts]);
 
-  // Activate the local demo SOS interface.
-  const activateSOS = () => {
-    setSosActive(true);
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus("error");
+      setLocationError(t("geolocationNotSupported"));
+      return;
+    }
+
+    setLocationStatus("loading");
+    setLocationError("");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          timestamp: new Date(position.timestamp).toLocaleString(),
+        });
+        setLocationStatus("success");
+      },
+      (error) => {
+        setLocationStatus("error");
+
+        const messages = {
+          1: t("locationPermissionDenied"),
+          2: t("locationUnavailable"),
+          3: t("locationTimeout"),
+        };
+
+        setLocationError(
+          messages[error.code] || t("locationDetectionFailed")
+        );
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+      }
+    );
   };
 
-  // Reset the local demo SOS interface.
+  // This is a demo SOS action. It does not send a real emergency alert.
+  const activateSOS = () => {
+    setSosActive(true);
+    getCurrentLocation();
+  };
+
   const resetSOS = () => {
     setSosActive(false);
   };
 
-  // Reset the contact form and close it.
   const closeContactForm = () => {
     setNewContact({
       name: "",
@@ -71,7 +121,6 @@ function Emergency() {
     setShowContactForm(false);
   };
 
-  // Open the form to add a new contact.
   const openAddForm = () => {
     setNewContact({
       name: "",
@@ -82,14 +131,13 @@ function Emergency() {
     setShowContactForm(true);
   };
 
-  // Save a new contact or update an existing contact.
   const handleSaveContact = (event) => {
     event.preventDefault();
 
     const cleanedPhone = newContact.phone.replace(/[\s-]/g, "");
 
     if (!/^\+?[0-9]{10,15}$/.test(cleanedPhone)) {
-      alert("Please enter a valid phone number.");
+      alert(t("validPhoneNumber"));
       return;
     }
 
@@ -109,17 +157,13 @@ function Emergency() {
     } else {
       setContacts((previous) => [
         ...previous,
-        {
-          ...contactData,
-          id: Date.now(),
-        },
+        { ...contactData, id: Date.now() },
       ]);
     }
 
     closeContactForm();
   };
 
-  // Load the selected contact into the editing form.
   const handleEditContact = (contact) => {
     setNewContact({
       name: contact.name,
@@ -130,18 +174,17 @@ function Emergency() {
     setShowContactForm(true);
   };
 
-  // Remove a contact after confirmation.
   const removeContact = (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this emergency contact?"
-    );
-
-    if (confirmed) {
+    if (window.confirm(t("deleteContactConfirm"))) {
       setContacts((previous) =>
         previous.filter((contact) => contact.id !== id)
       );
     }
   };
+
+  const mapUrl = location
+    ? `https://www.google.com/maps?q=${location.latitude},${location.longitude}`
+    : "";
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -151,45 +194,42 @@ function Emergency() {
       />
 
       <main className="min-h-screen lg:ml-72">
-        {/* Page header */}
         <header className="flex h-20 items-center justify-between border-b border-white/10 bg-slate-950 px-5 sm:px-8">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
               className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 lg:hidden"
-              aria-label="Open sidebar"
+              aria-label={t("openSidebar")}
             >
               <Menu size={22} />
             </button>
             <div>
-              <h1 className="text-xl font-bold">Emergency SOS</h1>
+              <h1 className="text-xl font-bold">{t("emergency")}</h1>
               <p className="text-xs text-slate-400">
-                Emergency assistance and safety contacts
+                {t("emergencySubtitle")}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 rounded-full border border-teal-400/20 bg-teal-400/10 px-3 py-2 text-xs text-teal-400">
             <span className="h-2 w-2 rounded-full bg-teal-400"></span>
-            Safety Center
+            {t("safetyCenter")}
           </div>
         </header>
 
         <div className="space-y-8 p-5 sm:p-8">
-          {/* Introduction */}
           <section>
             <p className="mb-2 text-sm font-semibold tracking-widest text-red-400">
-              EMERGENCY ASSISTANCE
+              {t("emergencyAssistance").toUpperCase()}
             </p>
             <h2 className="text-2xl font-bold sm:text-3xl">
-              Your Safety Comes First
+              {t("yourSafetyFirst")}
             </h2>
             <p className="mt-2 text-sm text-slate-400">
-              Access emergency assistance and manage your trusted contacts.
+              {t("emergencyIntro")}
             </p>
           </section>
 
-          {/* SOS activation panel */}
           <section className="overflow-hidden rounded-3xl border border-red-500/20 bg-gradient-to-br from-red-950/60 via-slate-900 to-slate-900 p-6 sm:p-10">
             <div className="mx-auto max-w-xl text-center">
               <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 text-red-400">
@@ -197,13 +237,15 @@ function Emergency() {
               </div>
 
               <h3 className="text-2xl font-bold">
-                {sosActive ? "Demo SOS Activated" : "Need Emergency Help?"}
+                {sosActive
+                  ? t("demoSosActivated")
+                  : t("needEmergencyHelp")}
               </h3>
 
               <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-400">
                 {sosActive
-                  ? "The demo emergency state is active. No real emergency alert has been sent."
-                  : "Use the SOS control to preview the emergency activation interface. Real alert delivery will be connected later."}
+                  ? t("demoSosActiveDescription")
+                  : t("activateSosDescription")}
               </p>
 
               <button
@@ -220,128 +262,215 @@ function Emergency() {
                   <ShieldAlert size={42} />
                 )}
                 <span className="mt-2 text-2xl font-black">
-                  {sosActive ? "RESET" : "SOS"}
+                  {sosActive ? t("reset") : "SOS"}
                 </span>
                 <span className="mt-1 text-xs">
-                  {sosActive ? "Demo Active" : "Activate"}
+                  {sosActive ? t("demoActive") : t("activate")}
                 </span>
               </button>
 
               <p className="mt-6 text-xs text-slate-500">
-                {sosActive
-                  ? "Press Reset to clear the demo state."
-                  : "Demo only — does not contact emergency services."}
+                {t("demoOnlyDisclaimer")}
               </p>
             </div>
           </section>
 
-          {/* SOS contact preview */}
-          {sosActive && (
-            <section className="rounded-2xl border border-red-500/30 bg-red-500/5 p-5">
-              <div className="mb-4 flex items-center gap-3">
-                <Users className="text-red-400" size={23} />
-                <h3 className="font-bold text-red-400">
-                  Saved Emergency Contacts
-                </h3>
+          <section className="rounded-2xl border border-white/10 bg-slate-900 p-6">
+            <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-orange-400/10 p-3 text-orange-400">
+                  <MapPin size={24} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">
+                    {t("currentGpsLocation")}
+                  </h3>
+                  <p className="text-sm text-slate-400">
+                    {t("detectGpsDescription")}
+                  </p>
+                </div>
               </div>
 
-              {contacts.length === 0 ? (
-                <p className="text-sm text-slate-400">
-                  No emergency contacts have been added yet.
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {contacts.map((contact) => (
-                    <div
-                      key={contact.id}
-                      className="flex flex-col justify-between gap-3 rounded-xl border border-white/10 bg-slate-900 p-4 sm:flex-row sm:items-center"
-                    >
-                      <div>
-                        <p className="font-semibold">{contact.name}</p>
-                        <p className="mt-1 text-sm text-slate-400">
-                          {contact.relationship} · {contact.phone}
-                        </p>
-                      </div>
-                      <a
-                        href={`tel:${contact.phone}`}
-                        className="flex items-center justify-center gap-2 rounded-lg bg-teal-500 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-600"
-                      >
-                        <Phone size={16} />
-                        Call
-                      </a>
-                    </div>
-                  ))}
+              <button
+                onClick={getCurrentLocation}
+                disabled={locationStatus === "loading"}
+                className="flex items-center justify-center gap-2 rounded-xl bg-teal-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-teal-300 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {locationStatus === "loading" ? (
+                  <RefreshCw size={18} className="animate-spin" />
+                ) : (
+                  <LocateFixed size={18} />
+                )}
+                {locationStatus === "loading"
+                  ? t("detecting")
+                  : t("getCurrentLocation")}
+              </button>
+            </div>
+
+            {locationStatus === "success" && location ? (
+              <div className="rounded-xl border border-teal-400/20 bg-teal-400/5 p-5">
+                <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-teal-400">
+                  <CheckCircle2 size={19} />
+                  {t("locationDetectedSuccessfully")}
                 </div>
-              )}
 
-              <p className="mt-4 text-xs text-slate-500">
-                Contact shortcuts are displayed locally. No automatic
-                emergency notification is sent.
-              </p>
-            </section>
-          )}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p className="text-xs text-slate-400">
+                      {t("latitude")}
+                    </p>
+                    <p className="mt-1 break-all font-semibold">
+                      {location.latitude.toFixed(6)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400">
+                      {t("longitude")}
+                    </p>
+                    <p className="mt-1 break-all font-semibold">
+                      {location.longitude.toFixed(6)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400">
+                      {t("locationAccuracy")}
+                    </p>
+                    <p className="mt-1 font-semibold">
+                      {t("approximately")}{" "}
+                      {Math.round(location.accuracy)} {t("metres")}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400">
+                      {t("lastUpdated")}
+                    </p>
+                    <p className="mt-1 text-sm font-semibold">
+                      {location.timestamp}
+                    </p>
+                  </div>
+                </div>
 
-          {/* Emergency status cards */}
+                <a
+                  href={mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex items-center gap-2 rounded-xl bg-teal-500 px-5 py-3 text-sm font-semibold text-white hover:bg-teal-600"
+                >
+                  <Navigation size={17} />
+                  {t("viewLocationOnMaps")}
+                </a>
+              </div>
+            ) : locationStatus === "error" ? (
+              <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
+                <div className="flex items-center gap-2 font-semibold text-red-400">
+                  <AlertTriangle size={19} />
+                  {t("locationDetectionFailedTitle")}
+                </div>
+                <p className="mt-2 text-sm text-slate-400">
+                  {locationError}
+                </p>
+                <button
+                  onClick={getCurrentLocation}
+                  className="mt-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-400 hover:bg-red-500/20"
+                >
+                  {t("tryAgain")}
+                </button>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-slate-700 p-8 text-center">
+                <MapPin
+                  className="mx-auto mb-3 text-slate-500"
+                  size={34}
+                />
+                <p className="font-semibold">
+                  {t("locationNotDetected")}
+                </p>
+                <p className="mt-2 text-sm text-slate-400">
+                  {t("allowLocationAccess")}
+                </p>
+              </div>
+            )}
+
+            <p className="mt-4 text-xs leading-5 text-slate-500">
+              {t("locationPrivacyNote")}
+            </p>
+          </section>
+
           <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-slate-400">SOS Status</p>
+                <p className="text-sm text-slate-400">
+                  {t("sosStatus")}
+                </p>
                 <ShieldAlert
                   size={22}
                   className={sosActive ? "text-red-400" : "text-teal-400"}
                 />
               </div>
               <h3 className="mt-4 text-xl font-bold">
-                {sosActive ? "Demo Active" : "Not Activated"}
+                {sosActive ? t("demoActive") : t("notActivated")}
               </h3>
               <p className="mt-2 text-xs text-slate-500">
-                {sosActive ? "Local demo state only" : "No demo alert active"}
+                {t("localDemoState")}
               </p>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-slate-400">Location Access</p>
+                <p className="text-sm text-slate-400">
+                  {t("locationAccess")}
+                </p>
                 <MapPin size={22} className="text-orange-400" />
               </div>
-              <h3 className="mt-4 text-xl font-bold">Not Connected</h3>
+              <h3 className="mt-4 text-xl font-bold">
+                {locationStatus === "success"
+                  ? t("connected")
+                  : locationStatus === "loading"
+                  ? t("detecting")
+                  : locationStatus === "error"
+                  ? t("unavailable")
+                  : t("notRequested")}
+              </h3>
               <p className="mt-2 text-xs text-slate-500">
-                GPS integration pending
+                {t("browserGpsPermission")}
               </p>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-slate-400">Emergency Contacts</p>
+                <p className="text-sm text-slate-400">
+                  {t("emergencyContacts")}
+                </p>
                 <Phone size={22} className="text-teal-400" />
               </div>
-              <h3 className="mt-4 text-xl font-bold">{contacts.length}</h3>
+              <h3 className="mt-4 text-xl font-bold">
+                {contacts.length}
+              </h3>
               <p className="mt-2 text-xs text-slate-500">
-                Saved in this browser
+                {t("savedInBrowser")}
               </p>
             </div>
           </section>
 
-          {/* Emergency contacts */}
           <section className="rounded-2xl border border-white/10 bg-slate-900 p-6">
             <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
-                <h3 className="text-lg font-bold">Emergency Contacts</h3>
+                <h3 className="text-lg font-bold">
+                  {t("emergencyContacts")}
+                </h3>
                 <p className="mt-1 text-sm text-slate-400">
-                  Manage people you trust during an emergency.
+                  {t("manageTrustedContacts")}
                 </p>
               </div>
-
               <button
                 onClick={openAddForm}
-                className="flex items-center justify-center gap-2 rounded-xl bg-teal-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-teal-300"
+                className="flex items-center justify-center gap-2 rounded-xl bg-teal-400 px-4 py-3 text-sm font-bold text-slate-950 hover:bg-teal-300"
               >
                 <Plus size={18} />
-                Add Contact
+                {t("addContact")}
               </button>
             </div>
 
-            {/* Add and edit contact form */}
             {showContactForm && (
               <form
                 onSubmit={handleSaveContact}
@@ -349,13 +478,15 @@ function Emergency() {
               >
                 <div className="mb-5 flex items-center justify-between">
                   <h4 className="font-semibold">
-                    {editingId !== null ? "Edit Contact" : "Add New Contact"}
+                    {editingId !== null
+                      ? t("editContact")
+                      : t("addNewContact")}
                   </h4>
                   <button
                     type="button"
                     onClick={closeContactForm}
                     className="rounded-lg p-2 text-slate-400 hover:bg-slate-800"
-                    aria-label="Close contact form"
+                    aria-label={t("closeForm")}
                   >
                     <X size={19} />
                   </button>
@@ -363,7 +494,9 @@ function Emergency() {
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-sm">Contact Name</label>
+                    <label className="mb-2 block text-sm">
+                      {t("contactName")}
+                    </label>
                     <input
                       type="text"
                       value={newContact.name}
@@ -373,15 +506,17 @@ function Emergency() {
                           name: event.target.value,
                         })
                       }
-                      placeholder="Enter name"
-                      required
+                      placeholder={t("enterName")}
                       maxLength={60}
+                      required
                       className="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm outline-none focus:border-teal-400"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm">Phone Number</label>
+                    <label className="mb-2 block text-sm">
+                      {t("phoneNumber")}
+                    </label>
                     <input
                       type="tel"
                       value={newContact.phone}
@@ -400,7 +535,7 @@ function Emergency() {
 
                   <div className="sm:col-span-2">
                     <label className="mb-2 block text-sm">
-                      Relationship
+                      {t("relationship")}
                     </label>
                     <select
                       value={newContact.relationship}
@@ -412,13 +547,13 @@ function Emergency() {
                       }
                       className="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white outline-none focus:border-teal-400"
                     >
-                      <option value="Family">Family</option>
-                      <option value="Parent">Parent</option>
-                      <option value="Sibling">Sibling</option>
-                      <option value="Friend">Friend</option>
-                      <option value="Relative">Relative</option>
-                      <option value="Partner">Partner</option>
-                      <option value="Other">Other</option>
+                      <option value="Family">{t("family")}</option>
+                      <option value="Parent">{t("parent")}</option>
+                      <option value="Sibling">{t("sibling")}</option>
+                      <option value="Friend">{t("friend")}</option>
+                      <option value="Relative">{t("relative")}</option>
+                      <option value="Partner">{t("partner")}</option>
+                      <option value="Other">{t("other")}</option>
                     </select>
                   </div>
                 </div>
@@ -428,27 +563,33 @@ function Emergency() {
                     type="submit"
                     className="flex-1 rounded-xl bg-teal-400 py-3 font-bold text-slate-950 hover:bg-teal-300"
                   >
-                    {editingId !== null ? "Update Contact" : "Save Contact"}
+                    {editingId !== null
+                      ? t("updateContact")
+                      : t("saveContact")}
                   </button>
                   <button
                     type="button"
                     onClick={closeContactForm}
                     className="rounded-xl border border-white/10 px-6 py-3 font-semibold text-slate-300 hover:bg-slate-800"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                 </div>
               </form>
             )}
 
-            {/* Contact list */}
             <div className="space-y-3">
               {contacts.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-slate-700 p-8 text-center">
-                  <Users className="mx-auto mb-3 text-slate-500" size={35} />
-                  <p className="font-semibold">No emergency contacts yet</p>
+                  <Users
+                    className="mx-auto mb-3 text-slate-500"
+                    size={35}
+                  />
+                  <p className="font-semibold">
+                    {t("noEmergencyContacts")}
+                  </p>
                   <p className="mt-1 text-sm text-slate-400">
-                    Add someone you trust to your emergency list.
+                    {t("addTrustedPerson")}
                   </p>
                 </div>
               ) : (
@@ -467,7 +608,11 @@ function Emergency() {
                           {contact.phone}
                         </p>
                         <span className="mt-2 inline-block rounded-full bg-teal-400/10 px-3 py-1 text-xs text-teal-400">
-                          {contact.relationship || "Other"}
+                          {t(
+                            `relationship_${(
+                              contact.relationship || "Other"
+                            ).toLowerCase()}`
+                          )}
                         </span>
                       </div>
                     </div>
@@ -478,14 +623,14 @@ function Emergency() {
                         className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-teal-400 hover:bg-teal-400/10"
                       >
                         <Pencil size={16} />
-                        Edit
+                        {t("edit")}
                       </button>
                       <button
                         onClick={() => removeContact(contact.id)}
                         className="flex items-center gap-2 rounded-lg border border-red-500/20 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10"
                       >
                         <Trash2 size={16} />
-                        Delete
+                        {t("delete")}
                       </button>
                     </div>
                   </div>
@@ -494,34 +639,41 @@ function Emergency() {
             </div>
           </section>
 
-          {/* Safety instructions */}
           <section className="rounded-2xl border border-orange-400/20 bg-orange-400/5 p-6">
             <div className="mb-5 flex items-center gap-3">
               <AlertTriangle size={23} className="text-orange-400" />
-              <h3 className="font-bold">Emergency Safety Guidelines</h3>
+              <h3 className="font-bold">
+                {t("emergencySafetyGuidelines")}
+              </h3>
             </div>
 
             <div className="space-y-4 text-sm text-slate-400">
               <p className="flex gap-3">
-                <CheckCircle2 size={18} className="shrink-0 text-teal-400" />
-                Move to a safe and public location if possible.
+                <CheckCircle2
+                  size={18}
+                  className="shrink-0 text-teal-400"
+                />
+                {t("guidelineSafePlace")}
               </p>
               <p className="flex gap-3">
-                <CheckCircle2 size={18} className="shrink-0 text-teal-400" />
-                Contact local emergency services when immediate help is needed.
+                <CheckCircle2
+                  size={18}
+                  className="shrink-0 text-teal-400"
+                />
+                {t("guidelineEmergencyServices")}
               </p>
               <p className="flex gap-3">
-                <CheckCircle2 size={18} className="shrink-0 text-teal-400" />
-                Keep your trusted contacts informed about your situation.
+                <CheckCircle2
+                  size={18}
+                  className="shrink-0 text-teal-400"
+                />
+                {t("guidelineInformContacts")}
               </p>
             </div>
           </section>
 
-          {/* Page disclaimer */}
           <footer className="border-t border-white/10 py-5 text-center text-xs leading-6 text-slate-500">
-            This is a frontend demonstration. No automatic SOS alert, SMS,
-            or GPS location is transmitted. Contact data is stored locally
-            in this browser and is not yet protected by backend authentication.
+            {t("emergencyFooterDisclaimer")}
           </footer>
         </div>
       </main>

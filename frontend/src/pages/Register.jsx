@@ -1,6 +1,6 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ShieldCheck,
   User,
@@ -15,9 +15,12 @@ import {
 } from "lucide-react";
 
 function Register() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -26,9 +29,9 @@ function Register() {
     confirmPassword: "",
     agreeTerms: false,
   });
+
   const [error, setError] = useState("");
 
-  // Update the form whenever an input changes.
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -37,32 +40,38 @@ function Register() {
     }));
   };
 
-  // Validate the form before submitting.
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
 
     if (formData.password.length < 8) {
-      setError("Password must contain at least 8 characters.");
+      setError(t("passwordMinLength"));
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("passwordsDoNotMatch"));
       return;
     }
 
     if (!formData.agreeTerms) {
-      setError("Please accept the Terms and Conditions.");
+      setError(t("acceptTermsRequired"));
       return;
     }
 
-    alert("Registration form submitted successfully! Backend integration will be added later.");
+    alert(t("registrationSubmittedDemo"));
     navigate("/login");
   };
 
   const inputClass =
     "w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3.5 pl-12 text-white outline-none transition focus:border-teal-400 focus:ring-2 focus:ring-teal-400/10 placeholder:text-slate-500";
+
+  const features = [
+    "aiPoweredSafetyMonitoring",
+    "realTimeLocationAssistance",
+    "emergencySosSupport",
+    "secureDigitalTouristIdentity",
+  ];
 
   return (
     <div className="min-h-screen bg-slate-950 px-4 py-10 text-white flex items-center justify-center">
@@ -72,9 +81,15 @@ function Register() {
           <div className="relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-teal-950 via-slate-900 to-slate-950 p-8 sm:p-12">
             <div className="absolute -right-20 top-40 h-72 w-72 rounded-full bg-teal-400/10 blur-3xl"></div>
 
-            <Link to="/" className="relative z-10 flex items-center gap-3 text-xl font-bold">
+            <Link
+              to="/"
+              className="relative z-10 flex items-center gap-3 text-xl font-bold"
+            >
               <ShieldCheck size={34} className="text-teal-400" />
-              <span>Smart Tourist <span className="text-teal-400">Safety</span></span>
+              <span>
+                {t("smartTourist")}{" "}
+                <span className="text-teal-400">{t("safety")}</span>
+              </span>
             </Link>
 
             <div className="relative z-10 my-10">
@@ -83,33 +98,30 @@ function Register() {
               </div>
 
               <h1 className="mb-5 text-4xl font-bold leading-tight sm:text-5xl">
-                Travel Freely.
+                {t("travelFreely")}
                 <br />
-                <span className="text-teal-400">Stay Secure.</span>
+                <span className="text-teal-400">{t("staySecure")}</span>
               </h1>
 
               <p className="max-w-md text-base leading-8 text-slate-300">
-                Create your account and experience smarter, safer and more
-                secure journeys with intelligent tourist safety assistance.
+                {t("registerPanelDescription")}
               </p>
 
               <div className="mt-10 space-y-6">
-                {[
-                  "AI-powered safety monitoring",
-                  "Real-time location assistance",
-                  "Emergency SOS support",
-                  "Secure digital tourist identity",
-                ].map((item) => (
+                {features.map((item) => (
                   <div key={item} className="flex items-center gap-3">
-                    <CheckCircle2 size={20} className="shrink-0 text-teal-400" />
-                    <span className="text-sm text-slate-300">{item}</span>
+                    <CheckCircle2
+                      size={20}
+                      className="shrink-0 text-teal-400"
+                    />
+                    <span className="text-sm text-slate-300">{t(item)}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <p className="relative z-10 text-xs text-slate-500">
-              AI-Powered Smart Tourist Safety & Incident Response System
+              {t("registrationSystemFooter")}
             </p>
           </div>
 
@@ -121,33 +133,38 @@ function Register() {
                 className="mb-8 inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-teal-400"
               >
                 <ArrowLeft size={17} />
-                Back to Home
+                {t("backToHome")}
               </Link>
 
               <p className="mb-2 text-sm font-bold tracking-widest text-teal-400">
-                GET STARTED
+                {t("getStartedLabel")}
               </p>
 
               <h2 className="mb-2 text-3xl font-bold sm:text-4xl">
-                Create Account
+                {t("createAccount")}
               </h2>
 
               <p className="mb-7 text-sm leading-6 text-slate-400">
-                Join Smart Tourist Safety and make every journey safer.
+                {t("registerDescription")}
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Full name field */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Full Name</label>
+                  <label className="mb-2 block text-sm font-medium">
+                    {t("fullName")}
+                  </label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={19} />
+                    <User
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                      size={19}
+                    />
                     <input
                       type="text"
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleChange}
-                      placeholder="Enter your full name"
+                      placeholder={t("enterFullName")}
                       className={inputClass}
                       required
                     />
@@ -156,15 +173,20 @@ function Register() {
 
                 {/* Email field */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Email Address</label>
+                  <label className="mb-2 block text-sm font-medium">
+                    {t("emailAddress")}
+                  </label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={19} />
+                    <Mail
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                      size={19}
+                    />
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="Enter your email"
+                      placeholder={t("enterEmail")}
                       className={inputClass}
                       required
                     />
@@ -173,17 +195,22 @@ function Register() {
 
                 {/* Phone number field */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Phone Number</label>
+                  <label className="mb-2 block text-sm font-medium">
+                    {t("phoneNumber")}
+                  </label>
                   <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={19} />
+                    <Phone
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                      size={19}
+                    />
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="Enter your phone number"
+                      placeholder={t("enterPhoneNumber")}
                       pattern="[0-9]{10}"
-                      title="Enter a valid 10-digit phone number"
+                      title={t("validPhoneNumber")}
                       className={inputClass}
                       required
                     />
@@ -192,21 +219,27 @@ function Register() {
 
                 {/* Password field */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Password</label>
+                  <label className="mb-2 block text-sm font-medium">
+                    {t("password")}
+                  </label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={19} />
+                    <Lock
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                      size={19}
+                    />
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      placeholder="Create a password"
+                      placeholder={t("createPassword")}
                       className={`${inputClass} pr-12`}
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? t("hidePassword") : t("showPassword")}
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-400"
                     >
                       {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
@@ -216,24 +249,40 @@ function Register() {
 
                 {/* Confirm password field */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Confirm Password</label>
+                  <label className="mb-2 block text-sm font-medium">
+                    {t("confirmPassword")}
+                  </label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={19} />
+                    <Lock
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                      size={19}
+                    />
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      placeholder="Confirm your password"
+                      placeholder={t("confirmYourPassword")}
                       className={`${inputClass} pr-12`}
                       required
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      aria-label={
+                        showConfirmPassword
+                          ? t("hidePassword")
+                          : t("showPassword")
+                      }
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-400"
                     >
-                      {showConfirmPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+                      {showConfirmPassword ? (
+                        <EyeOff size={19} />
+                      ) : (
+                        <Eye size={19} />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -248,7 +297,12 @@ function Register() {
                     className="mt-1 accent-teal-400"
                   />
                   <span>
-                    I agree to the <span className="text-teal-400">Terms and Conditions</span> and Privacy Policy.
+                    {t("agreeTermsPrefix")}{" "}
+                    <span className="text-teal-400">
+                      {t("termsAndConditions")}
+                    </span>{" "}
+                    {t("and")}{" "}
+                    <span className="text-teal-400">{t("privacyPolicy")}</span>.
                   </span>
                 </label>
 
@@ -262,21 +316,26 @@ function Register() {
                   type="submit"
                   className="flex w-full items-center justify-center gap-3 rounded-xl bg-teal-400 py-4 font-bold text-slate-950 transition hover:bg-teal-300"
                 >
-                  Create Account
+                  {t("createAccount")}
                   <ArrowRight size={19} />
                 </button>
               </form>
 
               <div className="my-7 flex items-center gap-4">
                 <div className="h-px flex-1 bg-slate-700"></div>
-                <span className="text-xs text-slate-500">ALREADY REGISTERED?</span>
+                <span className="text-xs text-slate-500">
+                  {t("alreadyRegisteredLabel")}
+                </span>
                 <div className="h-px flex-1 bg-slate-700"></div>
               </div>
 
               <p className="text-center text-sm text-slate-400">
-                Already have an account?{" "}
-                <Link to="/login" className="font-bold text-teal-400 hover:text-teal-300">
-                  Login
+                {t("alreadyHaveAccount")}{" "}
+                <Link
+                  to="/login"
+                  className="font-bold text-teal-400 hover:text-teal-300"
+                >
+                  {t("login")}
                 </Link>
               </p>
             </div>
